@@ -1,4 +1,4 @@
-# Neko-Money 🐱💸
+# Nekonometrics 🐱📈
 
 ![Python](https://img.shields.io/badge/python-3.12+-orange?logo=python&logoColor=white) 
 ![NixOS](https://img.shields.io/badge/NixOS-blue?logo=nixos&logoColor=white&color=5277C3)
