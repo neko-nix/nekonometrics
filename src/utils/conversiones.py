@@ -105,7 +105,7 @@ def get_vt():
     return get_indicator('VT', 'VT', ttl_minutes=60)
 
 def get_vwce():
-    return get_indicator('FTAW', 'FTSS.DE', ttl_minutes=60)
+    return get_indicator('FTAW', 'FTAW.AS', ttl_minutes=60)
 
 
 def get_uf():
@@ -151,5 +151,5 @@ if __name__ == "__main__":
     print(f"Dólar:  ${get_usd():,.2f} CLP")
     print(f"Euro:   ${get_eur():,.2f} CLP")
     print(f"VT:     ${get_vt():,.2f} USD")
-    print(f"FTAW:   €{get_vwce():,.2f} EUR")
+    print(f"FTAW:   ${get_vwce():,.2f} USD")
     print(f"UF:     ${get_uf():,.2f} CLP")
