@@ -1,0 +1,237 @@
+
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+        <link rel="stylesheet" type="text/css" href="styles.css">
+        <style>
+            /* ── Base ── */
+            body {
+                background-color: transparent !important;   /* ← NO TOCAR: va en iframe */
+                margin: 0;
+                padding: 0;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                font-size: 14px;
+                color: #e8e2d4;
+            }
+
+            /* ── Tabla ── */
+            #tabla-paises {
+                width: 100% !important;
+                margin-top: 10px !important;
+                border-collapse: collapse !important;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+            }
+
+            #tabla-paises thead th {
+                background-color: #1f1913 !important;
+                color: #f0b64b !important;
+                font-size: 14px !important;
+                font-weight: 600 !important;
+                padding: 11px 12px !important;
+                border-bottom: 2px solid #3d2e20 !important;
+                text-align: left !important;
+                background-image: none !important;   /* apaga las flechas PNG invisibles */
+            }
+
+            #tabla-paises tbody td {
+                font-size: 14px !important;
+                padding: 10px 12px !important;
+                border-bottom: 1px solid #241c14 !important;
+                line-height: 1.4 !important;
+                color: #d8d1c2 !important;
+            }
+
+            #tabla-paises tbody tr:nth-child(even) {
+                background-color: #14100b !important;
+            }
+            #tabla-paises tbody tr:hover {
+                background-color: #2a2118 !important;
+            }
+
+            /* ── Flechas de orden ── */
+            #tabla-paises thead th.sorting::after      { content: " ⇅"; font-size: 10px; color: #6b5d4a; }
+            #tabla-paises thead th.sorting_asc::after  { content: " ▲"; font-size: 10px; color: #f0b64b; }
+            #tabla-paises thead th.sorting_desc::after { content: " ▼"; font-size: 10px; color: #f0b64b; }
+
+            /* ── Botón de columnas ── */
+            .dt-button.buttons-colvis {
+                background: #1f1913 !important;
+                color: #f0b64b !important;
+                border: 1px solid #3d2e20 !important;
+                border-radius: 6px !important;
+                padding: 6px 12px !important;
+                font-size: 14px !important;
+                font-weight: 600 !important;
+                margin-bottom: 10px !important;
+            }
+            .dt-button.buttons-colvis:hover {
+                background: #2a2118 !important;
+                border-color: #f0b64b !important;
+            }
+
+            /* ── Menú desplegable del colvis (viene blanco) ── */
+            .dt-button-collection {
+                background: #1f1913 !important;
+                border: 1px solid #3d2e20 !important;
+                border-radius: 6px !important;
+            }
+            .dt-button-collection a.dt-button {
+                color: #e8e2d4 !important;
+                background: transparent !important;
+            }
+            .dt-button-collection a.dt-button:hover {
+                background: #2a2118 !important;
+                color: #f0b64b !important;
+            }
+
+            /* ── Buscador ── */
+            .dataTables_wrapper .dataTables_filter { font-size: 14px !important; color: #a89c85; }
+            .dataTables_wrapper .dataTables_filter input {
+                background: #14100b !important;
+                border: 1px solid #3d2e20 !important;
+                border-radius: 6px !important;
+                padding: 5px 10px !important;
+                font-size: 14px !important;
+                color: #e8e2d4 !important;
+            }
+            .dataTables_wrapper .dataTables_filter input:focus {
+                border-color: #f0b64b !important;
+                outline: none;
+            }
+            .dataTables_wrapper .dataTables_filter input::placeholder { color: #6b5d4a; }
+
+            /* ── Textos nativos de DataTables (vienen gris oscuro) ── */
+            .dataTables_wrapper .dataTables_info,
+            .dataTables_wrapper .dataTables_length,
+            .dataTables_wrapper .dataTables_length label,
+            .dataTables_wrapper .dataTables_filter label {
+                color: #a89c85 !important;
+                font-size: 14px !important;
+            }
+
+            .dataTables_wrapper .dataTables_length select {
+                background: #14100b !important;
+                color: #e8e2d4 !important;
+                border: 1px solid #3d2e20 !important;
+                border-radius: 6px !important;
+                padding: 4px 8px !important;
+            }
+
+            /* ── Paginación ── */
+            .dataTables_wrapper .dataTables_paginate { font-size: 14px !important; }
+            .dataTables_wrapper .dataTables_paginate .paginate_button {
+                color: #a89c85 !important;
+                background: transparent !important;
+                border: 1px solid transparent !important;
+                border-radius: 6px !important;
+            }
+            .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+                background: #2a2118 !important;
+                color: #f0b64b !important;
+                border-color: #3d2e20 !important;
+            }
+            .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+            .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+                background: #f0b64b !important;
+                color: #1f1710 !important;
+                border: 1px solid #f0b64b !important;
+            }
+            .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+            .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
+                color: #6b5d4a !important;
+                background: transparent !important;
+            }
+        </style>
+    </head>
+    <body>
+
+        <table id="tabla-paises" class="display compact" border="0">
+            <thead>
+                <tr>
+                    <th>País</th>
+                    <th>Región / Continente</th>
+                    <th>Peso Global</th>
+                    <th>Peso en Región</th>
+                    <th>N° Empresas</th>
+                    <th>Empresa Líder</th>
+                    <th>Líder (Peso Global)</th>
+                    <th>Líder (Peso País)</th>
+                </tr>
+            </thead>
+        </table>
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
+        
+        <script>
+            $(document).ready(function() {
+                var mapeoBanderas = {
+                    "United States": "🇺🇸", "Canada": "🇨🇦", "Mexico": "🇲🇽", "Argentina": "🇦🇷", "Brazil": "🇧🇷", "Chile": "🇨🇱", "Colombia": "🇨🇴", "Peru": "🇵🇪", "United Kingdom": "🇬🇧", "Germany": "🇩🇪", "France": "🇫🇷", "Italy": "🇮🇹", "Spain": "🇪🇸", "Netherlands": "🇳🇱", "Belgium": "🇧🇪", "Switzerland": "🇨🇭", "Austria": "🇦🇹", "Ireland": "🇮🇪", "Denmark": "🇩🇰", "Finland": "🇫🇮", "Norway": "🇳🇴", "Sweden": "🇸🇪", "Portugal": "🇵🇹", "Greece": "🇬🇷", "Poland": "🇵🇱", "Czech Republic": "🇨🇿", "Hungary": "🇭🇺", "Turkey": "🇹🇷", "Japan": "🇯🇵", "China": "🇨🇳", "South Korea": "🇰🇷", "Taiwan": "🇹🇼", "Taiwan, Province Of China": "🇹🇼", "Hong Kong": "🇭🇰", "Singapore": "🇸🇬", "Malaysia": "🇲🇾", "Indonesia": "🇮🇩", "Philippines": "🇵🇭", "Thailand": "🇹🇭", "India": "🇮🇳", "Israel": "🇮🇱", "Saudi Arabia": "🇸🇦", "United Arab Emirates": "🇦🇪", "Qatar": "🇶🇦", "Kuwait": "🇰🇼", "Bahrain": "🇧🇭", "Egypt": "🇪🇬", "Australia": "🇦🇺", "New Zealand": "🇳🇿", "South Africa": "🇿🇦", "Cayman Islands": "🇰🇾", "Bermuda": "🇧🇲"
+                };
+
+                var datosPaises = [{"pais":"United States","region":"Norteamérica","peso_global_num":61.4795948558,"peso_global_str":"61.48%","peso_continente_num":95.4754281334,"peso_continente_str":"95.48%","cant_empresas":1974,"top_empresa":"Apple","top_empresa_peso_global_num":1.677142713,"top_empresa_peso_global_str":"1.68%","top_empresa_peso_pais_num":2.7279664365,"top_empresa_peso_pais_str":"2.73%"},{"pais":"Japan","region":"Asia-Pacífico","peso_global_num":7.2532524659,"peso_global_str":"7.25%","peso_continente_num":36.659534468,"peso_continente_str":"36.66%","cant_empresas":1043,"top_empresa":"Tobu Railway","top_empresa_peso_global_num":0.0824733158,"top_empresa_peso_global_str":"0.08%","top_empresa_peso_pais_num":1.1370528759,"top_empresa_peso_pais_str":"1.14%"},{"pais":"United Kingdom","region":"Europa","peso_global_num":3.2366929947,"peso_global_str":"3.24%","peso_continente_num":25.3409309789,"peso_continente_str":"25.34%","cant_empresas":239,"top_empresa":"Shell","top_empresa_peso_global_num":0.1164762715,"top_empresa_peso_global_str":"0.12%","top_empresa_peso_pais_num":3.5986196921,"top_empresa_peso_pais_str":"3.60%"},{"pais":"Taiwan","region":"Asia-Pacífico","peso_global_num":3.1661405785,"peso_global_str":"3.17%","peso_continente_num":16.0023713796,"peso_continente_str":"16.00%","cant_empresas":615,"top_empresa":"Taiwan Semiconductor Company","top_empresa_peso_global_num":0.6325592973,"top_empresa_peso_global_str":"0.63%","top_empresa_peso_pais_num":19.9788759099,"top_empresa_peso_pais_str":"19.98%"},{"pais":"Canada","region":"Norteamérica","peso_global_num":2.9018759499,"peso_global_str":"2.90%","peso_continente_num":4.5065008863,"peso_continente_str":"4.51%","cant_empresas":233,"top_empresa":"B2Gold","top_empresa_peso_global_num":0.1067715447,"top_empresa_peso_global_str":"0.11%","top_empresa_peso_pais_num":3.6793972768,"top_empresa_peso_pais_str":"3.68%"},{"pais":"China","region":"Asia-Pacífico","peso_global_num":2.2737519561,"peso_global_str":"2.27%","peso_continente_num":11.4920428593,"peso_continente_str":"11.49%","cant_empresas":383,"top_empresa":"Tencent","top_empresa_peso_global_num":0.1883675227,"top_empresa_peso_global_str":"0.19%","top_empresa_peso_pais_num":8.2844358731,"top_empresa_peso_pais_str":"8.28%"},{"pais":"South Korea","region":"Asia-Pacífico","peso_global_num":2.0903428398,"peso_global_str":"2.09%","peso_continente_num":10.5650528154,"peso_continente_str":"10.57%","cant_empresas":281,"top_empresa":"Samsung Electronics","top_empresa_peso_global_num":0.5934107587,"top_empresa_peso_global_str":"0.59%","top_empresa_peso_pais_num":28.3882025204,"top_empresa_peso_pais_str":"28.39%"},{"pais":"Australia","region":"Asia-Pacífico","peso_global_num":2.0845200445,"peso_global_str":"2.08%","peso_continente_num":10.5356231262,"peso_continente_str":"10.54%","cant_empresas":201,"top_empresa":"Regis Resources","top_empresa_peso_global_num":0.0997989022,"top_empresa_peso_global_str":"0.10%","top_empresa_peso_pais_num":4.7876201727,"top_empresa_peso_pais_str":"4.79%"},{"pais":"India","region":"Asia-Pacífico","peso_global_num":1.6407242152,"peso_global_str":"1.64%","peso_continente_num":8.2925813216,"peso_continente_str":"8.29%","cant_empresas":835,"top_empresa":"Icici Bank  Spon","top_empresa_peso_global_num":0.0739316181,"top_empresa_peso_global_str":"0.07%","top_empresa_peso_pais_num":4.5060356518,"top_empresa_peso_pais_str":"4.51%"},{"pais":"Switzerland","region":"Europa","peso_global_num":1.579830239,"peso_global_str":"1.58%","peso_continente_num":12.3689114507,"peso_continente_str":"12.37%","cant_empresas":109,"top_empresa":"Roche Holding Ag","top_empresa_peso_global_num":0.1177536611,"top_empresa_peso_global_str":"0.12%","top_empresa_peso_pais_num":7.4535641967,"top_empresa_peso_pais_str":"7.45%"},{"pais":"France","region":"Europa","peso_global_num":1.4148400956,"peso_global_str":"1.41%","peso_continente_num":11.0771597022,"peso_continente_str":"11.08%","cant_empresas":105,"top_empresa":"Totalenergies Se","top_empresa_peso_global_num":0.0635983691,"top_empresa_peso_global_str":"0.06%","top_empresa_peso_pais_num":4.4950923664,"top_empresa_peso_pais_str":"4.50%"},{"pais":"Germany","region":"Europa","peso_global_num":1.3704740697,"peso_global_str":"1.37%","peso_continente_num":10.7298062762,"peso_continente_str":"10.73%","cant_empresas":141,"top_empresa":"Allianz Se","top_empresa_peso_global_num":0.0761875697,"top_empresa_peso_global_str":"0.08%","top_empresa_peso_pais_num":5.5592127869,"top_empresa_peso_pais_str":"5.56%"},{"pais":"Sweden","region":"Europa","peso_global_num":1.0726762926,"peso_global_str":"1.07%","peso_continente_num":8.3982682128,"peso_continente_str":"8.40%","cant_empresas":147,"top_empresa":"Clas Ohlson Ab B","top_empresa_peso_global_num":0.0501129236,"top_empresa_peso_global_str":"0.05%","top_empresa_peso_pais_num":4.6717657451,"top_empresa_peso_pais_str":"4.67%"},{"pais":"Netherlands","region":"Europa","peso_global_num":0.746481143,"peso_global_str":"0.75%","peso_continente_num":5.8443995624,"peso_continente_str":"5.84%","cant_empresas":47,"top_empresa":"Asml Holding","top_empresa_peso_global_num":0.1380791798,"top_empresa_peso_global_str":"0.14%","top_empresa_peso_pais_num":18.4973433182,"top_empresa_peso_pais_str":"18.50%"},{"pais":"Israel","region":"África \/ Medio Oriente","peso_global_num":0.7010139423,"peso_global_str":"0.70%","peso_continente_num":39.2146648274,"peso_continente_str":"39.21%","cant_empresas":95,"top_empresa":"Clal Insurance Enterpr Hldgs","top_empresa_peso_global_num":0.0689199091,"top_empresa_peso_global_str":"0.07%","top_empresa_peso_pais_num":9.8314605376,"top_empresa_peso_pais_str":"9.83%"},{"pais":"Italy","region":"Europa","peso_global_num":0.6791188879,"peso_global_str":"0.68%","peso_continente_num":5.3170025369,"peso_continente_str":"5.32%","cant_empresas":71,"top_empresa":"Saipem Spa","top_empresa_peso_global_num":0.0508688205,"top_empresa_peso_global_str":"0.05%","top_empresa_peso_pais_num":7.4904146216,"top_empresa_peso_pais_str":"7.49%"},{"pais":"Spain","region":"Europa","peso_global_num":0.582332591,"peso_global_str":"0.58%","peso_continente_num":4.5592368567,"peso_continente_str":"4.56%","cant_empresas":39,"top_empresa":"Banco Bilbao Vizcaya Sp","top_empresa_peso_global_num":0.0858508246,"top_empresa_peso_global_str":"0.09%","top_empresa_peso_pais_num":14.7425759582,"top_empresa_peso_pais_str":"14.74%"},{"pais":"Singapore","region":"Asia-Pacífico","peso_global_num":0.4547859638,"peso_global_str":"0.45%","peso_continente_num":2.2985883632,"peso_continente_str":"2.30%","cant_empresas":50,"top_empresa":"Golden Agri Resources","top_empresa_peso_global_num":0.0692185036,"top_empresa_peso_global_str":"0.07%","top_empresa_peso_pais_num":15.2200175637,"top_empresa_peso_pais_str":"15.22%"},{"pais":"Denmark","region":"Europa","peso_global_num":0.4524334232,"peso_global_str":"0.45%","peso_continente_num":3.5422216959,"peso_continente_str":"3.54%","cant_empresas":38,"top_empresa":"Torm  A","top_empresa_peso_global_num":0.0592722334,"top_empresa_peso_global_str":"0.06%","top_empresa_peso_pais_num":13.1007636414,"top_empresa_peso_pais_str":"13.10%"},{"pais":"Brazil","region":"Latinoamérica","peso_global_num":0.4341907789,"peso_global_str":"0.43%","peso_continente_num":55.6609384812,"peso_continente_str":"55.66%","cant_empresas":141,"top_empresa":"Petroleo Brasil Sp Pref","top_empresa_peso_global_num":0.0319552919,"top_empresa_peso_global_str":"0.03%","top_empresa_peso_pais_num":7.3597352622,"top_empresa_peso_pais_str":"7.36%"},{"pais":"Norway","region":"Europa","peso_global_num":0.4279581413,"peso_global_str":"0.43%","peso_continente_num":3.3505981999,"peso_continente_str":"3.35%","cant_empresas":60,"top_empresa":"Tgs Asa  Nok.25","top_empresa_peso_global_num":0.0555535005,"top_empresa_peso_global_str":"0.06%","top_empresa_peso_pais_num":12.9810593805,"top_empresa_peso_pais_str":"12.98%"},{"pais":"South Africa","region":"África \/ Medio Oriente","peso_global_num":0.4077575949,"peso_global_str":"0.41%","peso_continente_num":22.8099278069,"peso_continente_str":"22.81%","cant_empresas":59,"top_empresa":"Mtn Group   Zar.0001","top_empresa_peso_global_num":0.0418398446,"top_empresa_peso_global_str":"0.04%","top_empresa_peso_pais_num":10.2609602079,"top_empresa_peso_pais_str":"10.26%"},{"pais":"Hong Kong","region":"Asia-Pacífico","peso_global_num":0.3998323329,"peso_global_str":"0.40%","peso_continente_num":2.0208406172,"peso_continente_str":"2.02%","cant_empresas":69,"top_empresa":"Aia Group","top_empresa_peso_global_num":0.0337459095,"top_empresa_peso_global_str":"0.03%","top_empresa_peso_pais_num":8.4400151589,"top_empresa_peso_pais_str":"8.44%"},{"pais":"Belgium","region":"Europa","peso_global_num":0.3167257479,"peso_global_str":"0.32%","peso_continente_num":2.4797301844,"peso_continente_str":"2.48%","cant_empresas":28,"top_empresa":"Umicore","top_empresa_peso_global_num":0.0532344456,"top_empresa_peso_global_str":"0.05%","top_empresa_peso_pais_num":16.8077416984,"top_empresa_peso_pais_str":"16.81%"},{"pais":"Saudi Arabia","region":"África \/ Medio Oriente","peso_global_num":0.3002164116,"peso_global_str":"0.30%","peso_continente_num":16.7940824655,"peso_continente_str":"16.79%","cant_empresas":122,"top_empresa":"Saudi Arabian Oil","top_empresa_peso_global_num":0.0270758924,"top_empresa_peso_global_str":"0.03%","top_empresa_peso_pais_num":9.0187915506,"top_empresa_peso_pais_str":"9.02%"},{"pais":"Desconocido \/ Cash","region":"Otros","peso_global_num":0.2892385358,"peso_global_str":"0.29%","peso_continente_num":100.0,"peso_continente_str":"100.00%","cant_empresas":32,"top_empresa":"Weatherford International Pl","top_empresa_peso_global_num":0.2638908817,"top_empresa_peso_global_str":"0.26%","top_empresa_peso_pais_num":91.2364187746,"top_empresa_peso_pais_str":"91.24%"},{"pais":"Finland","region":"Europa","peso_global_num":0.2572199627,"peso_global_str":"0.26%","peso_continente_num":2.0138435529,"peso_continente_str":"2.01%","cant_empresas":35,"top_empresa":"Nokian Renkaat Oyj","top_empresa_peso_global_num":0.0382888857,"top_empresa_peso_global_str":"0.04%","top_empresa_peso_pais_num":14.8856586902,"top_empresa_peso_pais_str":"14.89%"},{"pais":"Mexico","region":"Latinoamérica","peso_global_num":0.2155868788,"peso_global_str":"0.22%","peso_continente_num":27.6370862377,"peso_continente_str":"27.64%","cant_empresas":33,"top_empresa":"Grupo Financiero Banorte O","top_empresa_peso_global_num":0.0295431352,"top_empresa_peso_global_str":"0.03%","top_empresa_peso_pais_num":13.7035868727,"top_empresa_peso_pais_str":"13.70%"},{"pais":"Austria","region":"Europa","peso_global_num":0.200150807,"peso_global_str":"0.20%","peso_continente_num":1.5670339431,"peso_continente_str":"1.57%","cant_empresas":17,"top_empresa":"Austria Technologie","top_empresa_peso_global_num":0.0553477903,"top_empresa_peso_global_str":"0.06%","top_empresa_peso_pais_num":27.6530437854,"top_empresa_peso_pais_str":"27.65%"},{"pais":"United Arab Emirates","region":"África \/ Medio Oriente","peso_global_num":0.1653146563,"peso_global_str":"0.17%","peso_continente_num":9.2476888779,"peso_continente_str":"9.25%","cant_empresas":39,"top_empresa":"Emaar Properties Pjsc","top_empresa_peso_global_num":0.0165124345,"top_empresa_peso_global_str":"0.02%","top_empresa_peso_pais_num":9.9884879276,"top_empresa_peso_pais_str":"9.99%"},{"pais":"Poland","region":"Europa","peso_global_num":0.1572079428,"peso_global_str":"0.16%","peso_continente_num":1.2308228286,"peso_continente_str":"1.23%","cant_empresas":27,"top_empresa":"Orlen Sa","top_empresa_peso_global_num":0.0160164813,"top_empresa_peso_global_str":"0.02%","top_empresa_peso_pais_num":10.1880865813,"top_empresa_peso_pais_str":"10.19%"},{"pais":"Thailand","region":"Asia-Pacífico","peso_global_num":0.1440119196,"peso_global_str":"0.14%","peso_continente_num":0.7278679402,"peso_continente_str":"0.73%","cant_empresas":91,"top_empresa":"Delta Electronics Thai Nvdr Nvdr Thb.1","top_empresa_peso_global_num":0.0073604984,"top_empresa_peso_global_str":"< 0.01%","top_empresa_peso_pais_num":5.1110341477,"top_empresa_peso_pais_str":"5.11%"},{"pais":"Malaysia","region":"Asia-Pacífico","peso_global_num":0.1370611814,"peso_global_str":"0.14%","peso_continente_num":0.6927373793,"peso_continente_str":"0.69%","cant_empresas":104,"top_empresa":"Cimb Group  Bhd","top_empresa_peso_global_num":0.0117946756,"top_empresa_peso_global_str":"0.01%","top_empresa_peso_pais_num":8.6054092596,"top_empresa_peso_pais_str":"8.61%"},{"pais":"Greece","region":"Europa","peso_global_num":0.0809906116,"peso_global_str":"0.08%","peso_continente_num":0.6340970561,"peso_continente_str":"0.63%","cant_empresas":21,"top_empresa":"Piraeus Bank Sa","top_empresa_peso_global_num":0.0156770272,"top_empresa_peso_global_str":"0.02%","top_empresa_peso_pais_num":19.3565981314,"top_empresa_peso_pais_str":"19.36%"},{"pais":"Ireland","region":"Europa","peso_global_num":0.0800099944,"peso_global_str":"0.08%","peso_continente_num":0.6264195428,"peso_continente_str":"0.63%","cant_empresas":8,"top_empresa":"Glenveagh Properties","top_empresa_peso_global_num":0.0291320212,"top_empresa_peso_global_str":"0.03%","top_empresa_peso_pais_num":36.4104777851,"top_empresa_peso_pais_str":"36.41%"},{"pais":"Kuwait","region":"África \/ Medio Oriente","peso_global_num":0.0744561628,"peso_global_str":"0.07%","peso_continente_num":4.1650718947,"peso_continente_str":"4.17%","cant_empresas":43,"top_empresa":"National Bank Of Kuwait  Kwd.1","top_empresa_peso_global_num":0.0193006068,"top_empresa_peso_global_str":"0.02%","top_empresa_peso_pais_num":25.922107819,"top_empresa_peso_pais_str":"25.92%"},{"pais":"Indonesia","region":"Asia-Pacífico","peso_global_num":0.0695430094,"peso_global_str":"0.07%","peso_continente_num":0.3514856763,"peso_continente_str":"0.35%","cant_empresas":59,"top_empresa":"Bank Rakyat Indonesia Perser","top_empresa_peso_global_num":0.0105912405,"top_empresa_peso_global_str":"0.01%","top_empresa_peso_pais_num":15.2297701638,"top_empresa_peso_pais_str":"15.23%"},{"pais":"Turkey","region":"África \/ Medio Oriente","peso_global_num":0.0656829002,"peso_global_str":"0.07%","peso_continente_num":3.6742962742,"peso_continente_str":"3.67%","cant_empresas":78,"top_empresa":"Tupras Turkiye Petrol Rafine","top_empresa_peso_global_num":0.0058222679,"top_empresa_peso_global_str":"< 0.01%","top_empresa_peso_pais_num":8.864206534,"top_empresa_peso_pais_str":"8.86%"},{"pais":"Portugal","region":"Europa","peso_global_num":0.0639818428,"peso_global_str":"0.06%","peso_continente_num":0.5009308774,"peso_continente_str":"0.50%","cant_empresas":12,"top_empresa":"Banco Comercial Portugues R","top_empresa_peso_global_num":0.0191235572,"top_empresa_peso_global_str":"0.02%","top_empresa_peso_pais_num":29.8890377692,"top_empresa_peso_pais_str":"29.89%"},{"pais":"Qatar","region":"África \/ Medio Oriente","peso_global_num":0.0630741339,"peso_global_str":"0.06%","peso_continente_num":3.5283620909,"peso_continente_str":"3.53%","cant_empresas":25,"top_empresa":"Qatar National Bank","top_empresa_peso_global_num":0.0175814583,"top_empresa_peso_global_str":"0.02%","top_empresa_peso_pais_num":27.8742761753,"top_empresa_peso_pais_str":"27.87%"},{"pais":"Chile","region":"Latinoamérica","peso_global_num":0.0585616298,"peso_global_str":"0.06%","peso_continente_num":7.5072881112,"peso_continente_str":"7.51%","cant_empresas":22,"top_empresa":"Banco De Credito E Inversion","top_empresa_peso_global_num":0.0066736194,"top_empresa_peso_global_str":"< 0.01%","top_empresa_peso_pais_num":11.3958908456,"top_empresa_peso_pais_str":"11.40%"},{"pais":"Peru","region":"Latinoamérica","peso_global_num":0.044466322,"peso_global_str":"0.04%","peso_continente_num":5.7003449543,"peso_continente_str":"5.70%","cant_empresas":4,"top_empresa":"Credicorp","top_empresa_peso_global_num":0.0249865353,"top_empresa_peso_global_str":"0.02%","top_empresa_peso_pais_num":56.1920440908,"top_empresa_peso_pais_str":"56.19%"},{"pais":"Philippines","region":"Asia-Pacífico","peso_global_num":0.043426731,"peso_global_str":"0.04%","peso_continente_num":0.2194882571,"peso_continente_str":"0.22%","cant_empresas":24,"top_empresa":"Container Term Svcs","top_empresa_peso_global_num":0.0085684072,"top_empresa_peso_global_str":"< 0.01%","top_empresa_peso_pais_num":19.7307210951,"top_empresa_peso_pais_str":"19.73%"},{"pais":"Hungary","region":"Europa","peso_global_num":0.0406713797,"peso_global_str":"0.04%","peso_continente_num":0.3184270572,"peso_continente_str":"0.32%","cant_empresas":4,"top_empresa":"Richter Gedeon Nyrt","top_empresa_peso_global_num":0.0115104583,"top_empresa_peso_global_str":"0.01%","top_empresa_peso_pais_num":28.3011256927,"top_empresa_peso_pais_str":"28.30%"},{"pais":"New Zealand","region":"Asia-Pacífico","peso_global_num":0.0280529525,"peso_global_str":"0.03%","peso_continente_num":0.1417857966,"peso_continente_str":"0.14%","cant_empresas":14,"top_empresa":"Fletcher Building","top_empresa_peso_global_num":0.0050661612,"top_empresa_peso_global_str":"< 0.01%","top_empresa_peso_pais_num":18.0592797462,"top_empresa_peso_pais_str":"18.06%"},{"pais":"Colombia","region":"Latinoamérica","peso_global_num":0.0272580953,"peso_global_str":"0.03%","peso_continente_num":3.4943422157,"peso_continente_str":"3.49%","cant_empresas":9,"top_empresa":"Grupo Argos Sa","top_empresa_peso_global_num":0.0069329467,"top_empresa_peso_global_str":"< 0.01%","top_empresa_peso_pais_num":25.4344501532,"top_empresa_peso_pais_str":"25.43%"},{"pais":"Czech Republic","region":"Europa","peso_global_num":0.0127929595,"peso_global_str":"0.01%","peso_continente_num":0.1001594847,"peso_continente_str":"0.10%","cant_empresas":2,"top_empresa":"Moneta Money Bank As","top_empresa_peso_global_num":0.0077527313,"top_empresa_peso_global_str":"< 0.01%","top_empresa_peso_pais_num":60.6015470329,"top_empresa_peso_pais_str":"60.60%"},{"pais":"Egypt","region":"África \/ Medio Oriente","peso_global_num":0.0101163132,"peso_global_str":"0.01%","peso_continente_num":0.5659057626,"peso_continente_str":"0.57%","cant_empresas":1,"top_empresa":"Commercial  Bank","top_empresa_peso_global_num":0.0101163132,"top_empresa_peso_global_str":"0.01%","top_empresa_peso_pais_num":100.0,"top_empresa_peso_pais_str":"100.00%"},{"pais":"Cayman Islands","region":"Norteamérica","peso_global_num":0.0094931006,"peso_global_str":"< 0.01%","peso_continente_num":0.0147424173,"peso_continente_str":"0.01%","cant_empresas":5,"top_empresa":"Ftai Aviation","top_empresa_peso_global_num":0.0044597797,"top_empresa_peso_global_str":"< 0.01%","top_empresa_peso_pais_num":46.9791681984,"top_empresa_peso_pais_str":"46.98%"},{"pais":"Bermuda","region":"Norteamérica","peso_global_num":0.0021433651,"peso_global_str":"< 0.01%","peso_continente_num":0.003328563,"peso_continente_str":"< 0.01%","cant_empresas":3,"top_empresa":"Cushman","top_empresa_peso_global_num":0.0014934159,"top_empresa_peso_global_str":"< 0.01%","top_empresa_peso_pais_num":69.6762231961,"top_empresa_peso_pais_str":"69.68%"}];
+
+                $('#tabla-paises').DataTable({
+                    "data": datosPaises,
+                    "deferRender": true,
+                    "pageLength": 15,
+                    "lengthMenu": [[10, 15, 25, 50, 100, -1], [10, 15, 25, 50, 100, "Todos"]],
+                    "order": [[2, "desc"]], 
+                    "columns": [
+                        { "data": "pais" },
+                        { "data": "region" },
+                        { "data": "peso_global_num" },
+                        { "data": "peso_continente_num" },
+                        { "data": "cant_empresas" },
+                        { "data": "top_empresa" },
+                        { "data": "top_empresa_peso_global_num" },
+                        { "data": "top_empresa_peso_pais_num" }
+                    ],
+                    "dom": 'Blfrtip',
+                    "buttons": [
+                        {
+                            extend: 'colvis',
+                            text: '👁️ Columnas Visibles',
+                            postfixButtons: [ 'colvisRestore' ]
+                        }
+                    ],
+                    "columnDefs": [
+                        {
+                            "targets": [0],
+                            "render": function ( data, type, row ) {
+                                if ( type === 'sort' || type === 'type' ) { return data; }
+                                var emoji = mapeoBanderas[data] || '🌐';
+                                return emoji + " " + data;
+                            }
+                        },
+                        {
+                            "targets": [2],
+                            "render": function ( data, type, row ) { return type === 'display' ? row.peso_global_str : data; }
+                        },
+                        {
+                            "targets": [3],
+                            "render": function ( data, type, row ) { return type === 'display' ? row.peso_continente_str : data; }
+                        },
+                        {
+                            "targets": [6],
+                            "render": function ( data, type, row ) { return type === 'display' ? row.top_empresa_peso_global_str : data; }
+                        },
+                        {
+                            "targets": [7],
+                            "render": function ( data, type, row ) { return type === 'display' ? row.top_empresa_peso_pais_str : data; }
+                        }
+                    ],
+                    "language": {
+                        "url": "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+                    }
+                });
+            });
+        </script>
+    </body>
+    </html>
+    

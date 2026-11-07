@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Fintech Executive Dashboard</title>
+    <style>
+        :root{
+            --bg:#0f0d0a;        --surface:#17140f;
+            --surface-2:#1f1b14; --surface-3:#262019;
+            --border:#2b2519;    --border-soft:#221d15;
+            --border-strong:#3d3426;
+            --text:#e8e2d4;      --text-strong:#f7f2e4;
+            --muted:#a89c85;     --faint:#7a705e;
+            --accent:#f0b64b;    --accent-bright:#ffd280;
+            --accent-dim:#f0b64b;
+            --accent-soft:rgba(240,182,75,0.10);
+            --accent-line:rgba(240,182,75,0.22);
+            --pos:#4ade80;       --neg:#f87171;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 24px;
+            background-color: var(--bg);
+            color: var(--text);
+            color-scheme: dark;
+        }
+
+        ::selection { background: var(--accent); color: var(--bg); }
+
+        .dashboard-wrapper {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 4px;
+        }
+
+        .grid-multipliers {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        .multiplier-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.45);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .multiplier-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--muted);
+        }
+
+        .multiplier-badge {
+            background: var(--surface-3);
+            color: var(--accent);
+            border: 1px solid var(--accent-line);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .multiplier-value {
+            font-size: 38px;
+            font-weight: 800;
+            color: var(--accent);
+            margin: 12px 0 0 0;
+            letter-spacing: -0.03em;
+        }
+
+        .multiplier-pct {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            margin-top: -2px;
+        }
+
+        .multiplier-footer {
+            font-size: 12px;
+            color: var(--faint);
+            border-top: 1px dashed var(--border-soft);
+            padding-top: 8px;
+            margin-top: 4px;
+        }
+        .multiplier-footer strong { color: var(--text-strong); }
+
+        .chart-container {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.45);
+        }
+
+        .grid-kpis {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+        }
+
+        .kpi-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.45);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .kpi-big-value {
+            font-size: 26px;
+            font-weight: 800;
+            margin-top: 6px;
+            color: var(--text-strong);
+        }
+
+        .kpi-subtitle { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+        .kpi-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+        .kpi-table th, .kpi-table td { padding: 5px 0; text-align: right; }
+        .kpi-table th {
+            font-size: 9px;
+            color: var(--faint);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        .kpi-table td:first-child,
+        .kpi-table th:first-child {
+            text-align: left;
+            font-weight: 600;
+            color: var(--muted);
+        }
+        .kpi-table tr + tr td { border-top: 1px solid var(--border-soft); }
+
+        .val-yo    { font-weight: 700; color: var(--accent); }
+        .val-bench { color: var(--muted); font-weight: 500; }
+
+        .card-highlight {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%);
+            border-color: var(--border-strong);
+        }
+
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-dim); }
+
+
+        /* ── Botones del updatemenu: matar el hover blanco ── */
+        .updatemenu-item-rect {
+            fill: #1f1b14 !important;
+            stroke: #3d3426 !important;
+            stroke-width: 1px !important;
+        }
+        .updatemenu-button:hover .updatemenu-item-rect {
+            fill: #262019 !important;
+            stroke: #f0b64b !important;
+        }
+        .updatemenu-item-text {
+            fill: #e8e2d4 !important;
+        }
+        .updatemenu-button:hover .updatemenu-item-text {
+            fill: #f0b64b !important;
+        }
+
+        /* ── Lo mismo para el rangeselector (1m/6m/YTD…) ── */
+        .rangeselector .button rect {
+            fill: #1f1b14 !important;
+            stroke: #2b2519 !important;
+        }
+        .rangeselector .button:hover rect {
+            fill: #262019 !important;
+            stroke: #b8862f !important;
+        }
+        .rangeselector .button text {
+            fill: #e8e2d4 !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-wrapper">
+        
+        <div>
+            <div class="section-title">Rentabilidad Acumulada y Multiplicadores de Capital</div>
+            <div class="grid-multipliers">
+                <div class="multiplier-card">
+                    <div class="multiplier-header"><span>🇺🇸 Dólares Estadounidenses</span><span class="multiplier-badge">USD</span></div>
+                    <div class="multiplier-value" style="color: var(--text-strong)">1.02x</div>
+                    <div class="multiplier-pct" style="color: #4ade80;">+2.32%</div>
+                    <div class="multiplier-footer">Cada $1 es hoy <strong>$1.02</strong> (FTAW 1.03x)</div>
+                </div>
+                <div class="multiplier-card">
+                    <div class="multiplier-header"><span>🇨🇱 Pesos Chilenos</span><span class="multiplier-badge">CLP</span></div>
+                    <div class="multiplier-value" style="color: var(--text-strong)">1.04x</div>
+                    <div class="multiplier-pct" style="color: #4ade80;">+4.08%</div>
+                    <div class="multiplier-footer">Cada $1 es hoy <strong>$1.04</strong> (FTAW 1.05x)</div>
+                </div>
+                <div class="multiplier-card">
+                    <div class="multiplier-header"><span>🇨🇱 Unidad de Fomento</span><span class="multiplier-badge">UF</span></div>
+                    <div class="multiplier-value" style="color: var(--text-strong)">1.04x</div>
+                    <div class="multiplier-pct" style="color: #4ade80;">+3.97%</div>
+                    <div class="multiplier-footer">Poder de compra real: <strong>1.04x</strong> (FTAW 1.05x)</div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="section-title">Curva de Rentabilidad Acumulada</div>
+            <div class="chart-container">
+                <div>                        <script>window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.5.0.min.js" integrity="sha256-fHbNLP+GlIXN+efbQec78UkemUz3NJp7UmfGxC1tNxs=" crossorigin="anonymous"></script>                <div id="4b8c2caa-b207-47aa-8579-612bb90981d7" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("4b8c2caa-b207-47aa-8579-612bb90981d7")) {                    Plotly.newPlot(                        "4b8c2caa-b207-47aa-8579-612bb90981d7",                        [{"fill":"tozeroy","fillcolor":"rgba(240,182,75,0.06)","line":{"color":"#f0b64b","width":3},"name":"Nekonometrics (USD)","visible":true,"x":["2026-11-06T00:00:00.000000000","2026-11-07T00:00:00.000000000","2026-11-08T00:00:00.000000000","2026-11-09T00:00:00.000000000","2026-11-10T00:00:00.000000000","2026-11-11T00:00:00.000000000","2026-11-12T00:00:00.000000000","2026-11-13T00:00:00.000000000"],"y":{"dtype":"f8","bdata":"EIJEcuLY1D8QgkRy4tjUPxCCRHLi2NQ\u002f1BMDW5gN\u002fj+EkQooZj74P6BbpzwXLARAkBJ\u002fMqORAkCQEn8yo5ECQA=="},"type":"scatter"},{"line":{"color":"#8f8574","dash":"dot","width":1.5},"name":"FTAW (USD)","visible":true,"x":["2026-11-06T00:00:00.000000000","2026-11-07T00:00:00.000000000","2026-11-08T00:00:00.000000000","2026-11-09T00:00:00.000000000","2026-11-10T00:00:00.000000000","2026-11-11T00:00:00.000000000","2026-11-12T00:00:00.000000000","2026-11-13T00:00:00.000000000"],"y":{"dtype":"f8","bdata":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASDUcH2uf+T8w6LZLuOD0Py6O7mKjJAZACEXwKxjvBkAIRfArGO8GQA=="},"type":"scatter"},{"fill":"tozeroy","fillcolor":"rgba(240,182,75,0.06)","line":{"color":"#f0b64b","width":3},"name":"Nekonometrics (CLP)","visible":false,"x":["2026-11-06T00:00:00.000000000","2026-11-07T00:00:00.000000000","2026-11-08T00:00:00.000000000","2026-11-09T00:00:00.000000000","2026-11-10T00:00:00.000000000","2026-11-11T00:00:00.000000000","2026-11-12T00:00:00.000000000","2026-11-13T00:00:00.000000000"],"y":{"dtype":"f8","bdata":"UJUQXnF6xb9QlRBecXrFv1CVEF5xesW\u002fos45cxJ8AkCQAQUOM7bsP0jL2X\u002f7RQVA6MU+INLoCUChSdxNZE4QQA=="},"type":"scatter"},{"line":{"color":"#8f8574","dash":"dot","width":1.5},"name":"FTAW (CLP)","visible":false,"x":["2026-11-06T00:00:00.000000000","2026-11-07T00:00:00.000000000","2026-11-08T00:00:00.000000000","2026-11-09T00:00:00.000000000","2026-11-10T00:00:00.000000000","2026-11-11T00:00:00.000000000","2026-11-12T00:00:00.000000000","2026-11-13T00:00:00.000000000"],"y":{"dtype":"f8","bdata":"6LdPHdp737\u002fot08d2nvfv+i3Tx3ae9+\u002fRNbp3ZNCAECAOP8YVQXmP\u002fSPmg81PwdAniphcExQDkDVWpK4tIYSQA=="},"type":"scatter"},{"fill":"tozeroy","fillcolor":"rgba(240,182,75,0.06)","line":{"color":"#f0b64b","width":3},"name":"Nekonometrics (Real UF)","visible":false,"x":["2026-11-06T00:00:00.000000000","2026-11-07T00:00:00.000000000","2026-11-08T00:00:00.000000000","2026-11-09T00:00:00.000000000","2026-11-10T00:00:00.000000000","2026-11-11T00:00:00.000000000","2026-11-12T00:00:00.000000000","2026-11-13T00:00:00.000000000"],"y":{"dtype":"f8","bdata":"cJgQXnF6xb8QBU5V\u002fB\u002fHvxCZlH1rxci\u002fvMa5ZiQrAkD4aZlshe3qP64ElIvsrgRAGIhkLsctCUBKA6Nh0bwPQA=="},"type":"scatter"},{"line":{"color":"#8f8574","dash":"dot","width":1.5},"name":"FTAW (Real UF)","visible":false,"x":["2026-11-06T00:00:00.000000000","2026-11-07T00:00:00.000000000","2026-11-08T00:00:00.000000000","2026-11-09T00:00:00.000000000","2026-11-10T00:00:00.000000000","2026-11-11T00:00:00.000000000","2026-11-12T00:00:00.000000000","2026-11-13T00:00:00.000000000"],"y":{"dtype":"f8","bdata":"eLlPHdp737\u002fwW0E0+Cbgv2xv5Gv8j+C\u002fKHOzQbzj\u002fz8wYWu9mT3kPx5ZBS7JpwZAuqrZJ0KUDUBHDF88IBYSQA=="},"type":"scatter"}],                        {"template":{"data":{"barpolar":[{"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#f2f5fa"},"error_y":{"color":"#f2f5fa"},"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"baxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"line":{"color":"#283442"}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scattermap":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermap"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"marker":{"line":{"color":"#283442"}},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#506784"},"line":{"color":"rgb(17,17,17)"}},"header":{"fill":{"color":"#2a3f5f"},"line":{"color":"rgb(17,17,17)"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#f2f5fa","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#f2f5fa"},"geo":{"bgcolor":"rgb(17,17,17)","lakecolor":"rgb(17,17,17)","landcolor":"rgb(17,17,17)","showlakes":true,"showland":true,"subunitcolor":"#506784"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"dark"},"paper_bgcolor":"rgb(17,17,17)","plot_bgcolor":"rgb(17,17,17)","polar":{"angularaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","radialaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"yaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"zaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"}},"shapedefaults":{"line":{"color":"#f2f5fa"}},"sliderdefaults":{"bgcolor":"#C8D4E3","bordercolor":"rgb(17,17,17)","borderwidth":1,"tickwidth":0},"ternary":{"aaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"baxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","caxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"title":{"x":0.05},"updatemenudefaults":{"bgcolor":"#506784","borderwidth":0},"xaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2}}},"font":{"color":"#e8e2d4","size":12},"title":{"font":{"color":"#f7f2e4","size":15},"text":"\u003cb\u003eRentabilidad acumulada \u00b7 USD\u003c\u002fb\u003e","x":0.01,"xanchor":"left","y":0.97,"yanchor":"top"},"hoverlabel":{"font":{"color":"#f5e6c8","size":12},"bgcolor":"#1f1b14","bordercolor":"#b8862f"},"margin":{"t":135,"b":75,"l":55,"r":25},"yaxis":{"tickfont":{"color":"#a89c85"},"title":{"font":{"color":"#a89c85"}},"range":[-0.7750326780893296,4.88900503031329],"ticksuffix":"%","zeroline":true,"zerolinecolor":"#4a3f2a","zerolinewidth":2,"gridcolor":"#231e16"},"xaxis":{"tickfont":{"color":"#a89c85"},"rangeselector":{"font":{"color":"#e8e2d4","size":11},"x":0.5,"xanchor":"center","y":1.2,"yanchor":"top","bgcolor":"#1f1b14","activecolor":"#3d3426","bordercolor":"#2b2519","borderwidth":1,"buttons":[{"count":1,"label":"1m","step":"month","stepmode":"backward"},{"count":6,"label":"6m","step":"month","stepmode":"backward"},{"count":1,"label":"YTD","step":"year","stepmode":"todate"},{"count":1,"label":"1y","step":"year","stepmode":"backward"},{"step":"all"}]},"showgrid":true,"gridcolor":"#1c1811","type":"date"},"legend":{"font":{"color":"#a89c85","size":11},"orientation":"h","yanchor":"top","y":-0.16,"xanchor":"center","x":0.5,"bgcolor":"rgba(0,0,0,0)"},"modebar":{"bgcolor":"rgba(0,0,0,0)","color":"#7a705e","activecolor":"#f0b64b"},"paper_bgcolor":"#0f0d0a","plot_bgcolor":"#0f0d0a","updatemenus":[{"active":0,"bgcolor":"#1f1b14","bordercolor":"#3d3426","borderwidth":1,"buttons":[{"args":[{"visible":[true,true,false,false,false,false]},{"yaxis.title.text":"Retorno Neto USD (%)","title.text":"\u003cb\u003eRentabilidad acumulada \u00b7 USD\u003c\u002fb\u003e"}],"label":"\ud83c\uddfa\ud83c\uddf8 USD","method":"update"},{"args":[{"visible":[false,false,true,true,false,false]},{"yaxis.title.text":"Retorno Neto CLP (%)","title.text":"\u003cb\u003eRentabilidad acumulada \u00b7 CLP\u003c\u002fb\u003e"}],"label":"\ud83c\udde8\ud83c\uddf1 CLP","method":"update"},{"args":[{"visible":[false,false,false,false,true,true]},{"yaxis.title.text":"Retorno Neto UF (%)","title.text":"\u003cb\u003eRentabilidad acumulada \u00b7 UF\u003c\u002fb\u003e"}],"label":"\ud83c\udde8\ud83c\uddf1 UF","method":"update"}],"direction":"right","font":{"color":"#e8e2d4","size":12},"pad":{"r":6,"t":6},"showactive":true,"type":"buttons","x":0.5,"xanchor":"center","y":1.41,"yanchor":"top"}],"hovermode":"x unified"},                        {"responsive": true}                    )                };            </script>        </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="section-title">Métricas de crecimiento y riesgo</div>
+
+            <p style="font-size: 11px; color: var(--faint);">
+                        N/D = historial insuficiente (mínimo 180 días de seguimiento).
+                    </p>
+            <div class="grid-kpis">
+
+                    
+                
+                <div class="kpi-card card">
+                    <div>
+                        <div class="section-title" style="color: var(--accent-dim); font-size:12px;">📈 CAGR Anualizado</div>
+                        <div class="kpi-big-value" style="color: #7a705e; min-height: 1.2em;">N/D</div>
+                        <div class="kpi-subtitle">Retorno compuesto anual en USD</div>
+                    </div>
+                    <div style="margin-top: 14px; border-top: 1px dashed var(--border-soft); padding-top: 8px; display: flex; justify-content: space-between; font-size: 13px;">
+                        <span style="color: #7a705e; font-weight: 700;">🚀 Alfa: N/D</span>
+                        <span style="color: var(--faint);">FTAW: N/D</span>
+                    </div>
+
+                    
+                </div>
+
+
+                <div class="kpi-card">
+                    <div>
+                        <div class="section-title" style="var(--accent-dim); font-size:12px;">💰 Costo ponderado</div>
+                        <div class="kpi-big-value" style="color: var(--text-strong); min-height: 1.2em;">0.31%</div>
+                        <div class="kpi-subtitle">TER anual ponderado.</div>
+                    </div>
+                    <div style="margin-top: 14px; border-top: 1px dashed var(--border-soft); padding-top: 8px; display: flex; justify-content: space-between; font-size: 13px;">
+                        <span style="color: #f87171; font-weight: 700;">📉 Lastre: +0.24 pp/año</span>
+                        <span style="color: var(--faint);">FTAW: 0.07%</span>
+                    </div>
+                </div>
+
+
+
+             
+
+
+                <div class="kpi-card">
+                    <div>
+                        <div class="section-title" style="font-size:12px; color: var(--accent-dim);">⏳ Tiempo invertido</div>
+                        <div class="kpi-big-value" color:#1e293b; font-weight:700;">7 Días</div>
+                        <div class="kpi-subtitle" style="font-size: 12px; color: var(--muted); margin-top: 2px;">Si la página no se actualiza cuando corresponde, asuman que es porque se me cayó el internet.</div>
+                    </div>
+                    <div style="margin-top: 14px; border-top: 1px dashed var(--border-soft); padding-top: 8px; display: flex; justify-content: space-between; font-size: 12px; color: var(--faint);">
+                        <span>🗓️ Desde: 2026-11-06</span>
+                        
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
