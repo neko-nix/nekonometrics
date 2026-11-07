@@ -1,0 +1,367 @@
+/* ============================================================
+   NEKONOMETRICS — TEMA OSCURO
+   Cambiar de color = cambiar SOLO el bloque :root
+   Orden: tokens → reset → base → componentes → overrides → responsive
+   ============================================================ */
+
+/* ── 1. TOKENS ── */
+:root {
+    /* Superficies: chocolate, tabaco, cuero */
+    --bg:            #0f0d0a;
+    --surface:       #17140f;
+    --surface-2:     #1f1b14;
+    --surface-3:     #262019;
+
+    /* Bordes: cuero */
+    --border:         #2a2018;
+    --border-soft:    #3d2f22;
+    --border-strong:  #54402c;
+
+    /* Texto: crema */
+    --text:           #e8e2d4;
+    --text-strong:    #f7f2e4;
+    --muted:          #a89c85;
+    --faint:          #8a8070;
+ 
+
+    /* Acento: oro */
+    --accent:         #f0b64b;
+    --accent-bright:  #ffd280;
+    --accent-dim:     #c89a45;
+    --accent-soft:    rgba(240, 182, 75, 0.10);
+    --accent-line:    rgba(240, 182, 75, 0.22);
+
+    /* Semántica */
+    --pos:            #8fd18a;
+    --neg:            #e8887a;
+    
+}
+
+
+/* ── 2. RESET ── */
+* { box-sizing: border-box; }
+
+html, body { overflow-x: hidden; }   /* red de seguridad contra scroll horizontal ✅ */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 0;
+}
+
+::selection { background: var(--accent); color: var(--bg); }
+
+a { color: var(--accent); }
+a:hover { color: var(--accent-bright); }
+
+
+/* ── 3. HEADER ── */
+.header {
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%);
+    border-bottom: 2px solid var(--accent-dim);
+    color: var(--text-strong);
+    padding: 20px 40px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.55), inset 0 -1px 0 var(--accent-line);
+}
+.header h1 { margin: 0; font-size: 28px; color: var(--accent); letter-spacing: -0.01em; }
+.header p  { margin: 5px 0 0 0; color: var(--muted); }
+
+
+/* ── 4. LAYOUT ── */
+.container {
+    max-width: 1300px;
+    margin: 30px auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 25px;
+}
+
+
+/* ── 5. CARDS ── */
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+    display: flex;
+    flex-direction: column;
+}
+
+.card h2 {
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    border-image: linear-gradient(90deg, var(--accent), transparent) 1;
+    padding-bottom: 10px;
+}
+.card h2:first-child { margin-top: 0; }
+
+.card-subtitle {
+    font-size: 16px;
+
+    line-height: 1.5;
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+
+/* ── 6. CONTENEDORES DE GRÁFICO ── */
+.chart-container {
+    flex-grow: 1;
+    height: 520px;          /* DEFINIDA: el iframe hereda el 100% ✅ */
+    width: 100%;
+    position: relative;
+    background: var(--surface);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.map-container { position: relative; width: 100%; height: 550px; }
+
+.placeholder-card {
+    border: 2px dashed var(--border-strong);
+    background-color: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--faint);
+    font-style: italic;
+    min-height: 450px;
+}
+
+
+/* ── 7. IFRAMES ── */
+iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 8px;
+    display: block;
+    background: var(--surface);
+}
+
+
+/* ── 8. GRIDS ── */
+.grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr));
+    gap: 25px;
+}
+
+.grid-2 .chart-container { height: 600px; }
+
+.pilares-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+    margin-top: 15px;
+    margin-bottom: 25px;
+}
+
+.grid-kpi {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));   /* ← arreglado ✅ */
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+
+/* ── 9. OVERRIDES ESPECÍFICOS (más especificidad, no dependen del orden) ✅ ── */
+.grid-2 .chart-container.chart-container--stylebox { height: 500px; }
+.grid-2 .chart-container.chart-container--posiciones { height: 600px; }
+.grid-2 .chart-container.chart-container--industrias { height: 600px; }
+.card .chart-container.chart-container--historico { height: 1020px; }
+.grid-2 .chart-container.chart-container--divergencia { height: 580px; }
+
+/* ── 10. AVISO / DISCLAIMER ── */
+.warning-card {
+    background: var(--accent-soft);
+    border-left: 4px solid var(--accent-dim);
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.5;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+.warning-card strong { color: var(--accent-bright); }
+
+
+/* ── 11. KPIs ── */
+.kpi-card { text-align: center; padding: 15px !important; }
+.kpi-title {
+    font-size: 12px;
+    color: var(--accent-dim);
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+.kpi-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--text-strong);
+    margin: 0;
+}
+
+
+/* ── 12. TABLA DINÁMICA ── */
+.tabla-dinamica {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 14px;
+    color: var(--text);
+}
+.tabla-dinamica th {
+    background-color: var(--surface-3);
+    color: var(--accent);
+    padding: 12px 10px;
+    text-align: left;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+}
+.tabla-dinamica td { padding: 10px; border-bottom: 1px solid var(--border-soft); }
+.tabla-dinamica tr:nth-child(even) { background-color: rgba(255, 255, 255, 0.02); }
+.tabla-dinamica tr:hover           { background-color: var(--accent-soft); }
+
+
+/* ── 13. BARRAS DIVERGENTES ── */
+.diff-track { position: relative; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+.diff-fill  { position: absolute; top: 0; bottom: 0; border-radius: 3px; }
+.diff-mid   { position: absolute; top: 0; bottom: 0; left: 50%; width: 1px;
+              background: var(--faint); opacity: .85; }
+
+
+/* ── 14. SCROLLBAR ── */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 5px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-dim); }
+
+
+/* ══════════════════════════════════════════════════════════
+   15. RESPONSIVE — SIEMPRE AL FINAL, EN ORDEN DESCENDENTE ✅
+   (900 primero, 600 después: el 600 gana en pantallas chicas)
+   ══════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+    .grid-2 { grid-template-columns: minmax(0, 1fr); }
+    .grid-2 .chart-container { height: 480px; }
+    .grid-2 .chart-container.chart-container--stylebox { height: 520px; }
+    .grid-2 .chart-container.chart-container--posiciones { height: 820px; }
+    .grid-2 .chart-container.chart-container--industrias { height: 820px; }
+}
+
+@media (max-width: 600px) {
+    .header { padding: 16px 20px; }
+    .header h1 { font-size: 22px; }
+
+    .container { padding: 0 12px; margin: 20px auto; }
+    .card { padding: 18px; }
+
+    .chart-container { height: 420px; }
+    .grid-2 .chart-container { height: 400px; }
+    .grid-2 .chart-container.chart-container--stylebox { height: 890px; }
+    .grid-2 .chart-container.chart-container--posiciones { height: 600px; }
+    .grid-2 .chart-container.chart-container--industrias { height: 600px; }
+    .grid-2 .chart-container.chart-container--divisas { height: 600px; }
+    .grid-2 .chart-container.chart-container--divergencia { height: 600px; }
+    .card .chart-container.chart-container--historico { height: 1800px; }
+    .map-container { height: 420px; }
+}
+
+.chart-container.chart-container--treemap { height: 530px; }
+
+@media (max-width: 900px) {
+    .chart-container.chart-container--treemap { height: 620px; }
+}
+
+@media (max-width: 600px) {
+    .chart-container.chart-container--treemap { height: 620px; }
+}
+
+details.card > summary {
+    cursor: pointer;
+    font-weight: 600;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+details.card > summary::-webkit-details-marker { display: none; }
+details.card > summary::before { content: "▸"; opacity: .6; transition: transform .15s; }
+details.card[open] > summary::before { transform: rotate(90deg); }
+details.card > summary h2 { margin: 0; font-size: inherit; }
+
+.header-links { font-size: 14px; margin-top: 8px; }
+.header-links a { color: inherit; text-decoration: none; opacity: .85; font-weight: 600; }
+.header-links a:hover { opacity: 1; text-decoration: underline; }
+
+.pilar-card {
+    background: rgba(255,255,255,.04);   /* ← esto arregla la inconsistencia de abajo */
+    color: inherit;
+    border-radius: 12px;
+    text-align: center; padding: 10px;
+    border-left: 4px solid var(--accent, #f0b64b);
+}
+.pilar-card h3, .pilar-card p { color: inherit; }
+.pilar-card p { opacity: .8; }
+
+/* Footer del descargo, 1 línea chica */
+.footer-disclaimer {
+    max-width: 900px;
+    margin: 40px auto 60px;
+    padding: 0 20px;
+    font-size: 16px;
+    line-height: 1.6;
+    opacity: .55;
+}
+
+.tesis { max-width: 68ch; margin: 8px 0 16px; font-size: 16px; line-height: 1.55; opacity: .85; }
+.pilares-fold {
+    display: flex; flex-wrap: wrap; gap: 8px 14px;
+    list-style: none; margin: 0 0 14px; padding: 0;
+    font-size: 14px;
+}
+.pilares-fold li { opacity: .8; }
+.pilares-fold strong { opacity: 1; }
+.pilares-fold li + li { border-left: 1px solid rgba(255,255,255,.15); padding-left: 14px; }
+@media (max-width: 640px) {
+    .pilares-fold li + li { border-left: 0; padding-left: 0; }
+}
+
+.pilares-fold {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 14px;
+    padding: 0;
+    list-style: none;
+    font-size: 13px;
+}
+.pilares-fold li {
+    white-space: nowrap;        /* ← esto es lo que faltaba: no parte el chip */
+    padding: 4px 10px;
+    border: 1px solid rgba(255,255,255,.14);
+    border-radius: 999px;
+    opacity: .85;
+}
+
+html { scroll-behavior: smooth; }
+
+.volver { margin: 16px 0 0; font-size: 14px; }
+.volver a { opacity: .7; }
+.volver a:hover { opacity: 1; text-decoration: underline; }
+
+
+.card-subtitle a.ref {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: rgba(255,255,255,.35);
+    text-underline-offset: 2px;
+}
+.card-subtitle a.ref:hover { text-decoration-color: currentColor; }

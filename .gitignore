@@ -1,0 +1,12 @@
+data/
+scripts/
+src/
+tests/
+docs/
+*.md
+*.sh
+*.python
+*.python
+*.db
+*.css
+*.pyc
