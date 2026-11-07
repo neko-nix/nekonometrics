@@ -27,8 +27,8 @@ urlsEEUU = [
 urlsUCITS = [
     ["https://www.avantisinvestors.com/ucitsetf/total-holdings/20910451307042/?type=ucitsetf",  "data/All holdings_avem.csv"], # AVEM Emerging Equity
     #["https://www.avantisinvestors.com/ucitsetf/total-holdings/339814050701062/?type=ucitsetf", "data/All holdings_aveu.csv"], # AVEU Europe Equity
-    ["https://www.avantisinvestors.com/ucitsetf/total-holdings/840303451307042/?type=ucitsetf", "data/All holdings_avwc.csv"], # AVWC Global Equity
-    ["https://www.avantisinvestors.com/ucitsetf/total-holdings/295032351307042/?type=ucitsetf", "data/All holdings_avws.csv"], # AVWS Global Small Cap Value
+    ["https://www.avantisinvestors.com/ucitsetf/total-holdings/840303451307042/?type=ucitsetf", "data/All holdings_avgc.csv"], # AVWC Global Equity
+    ["https://www.avantisinvestors.com/ucitsetf/total-holdings/295032351307042/?type=ucitsetf", "data/All holdings_avgs.csv"], # AVWS Global Small Cap Value
     #["https://www.avantisinvestors.com/ucitsetf/total-holdings/167749050701062/?type=ucitsetf", "data/All holdings_avpe.csv"], # AVPE Pacific Equity
     #["https://www.avantisinvestors.com/ucitsetf/total-holdings/574426540701062/?type=ucitsetf", "data/All holdings_avus.csv"]  # AVUS America Equity
 ]

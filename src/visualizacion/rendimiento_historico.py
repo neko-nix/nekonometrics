@@ -211,7 +211,7 @@ def generar_dashboard_premium():
     pct_yo_uf = df_rendimiento['YO_UF'].iloc[-1]
 
     mult_yo_usd = 1 + (pct_yo_usd / 100)
-    mult_be_usd = 1 + (f_rendimiento['BENCH_USD'].iloc[-1] / 100)
+    mult_be_usd = 1 + (df_rendimiento['BENCH_USD'].iloc[-1] / 100)
     mult_yo_clp = 1 + (pct_yo_clp / 100)
     mult_be_clp = 1 + (df_rendimiento['BENCH_CLP'].iloc[-1] / 100)
     mult_yo_uf = 1 + (pct_yo_uf / 100)
@@ -241,7 +241,7 @@ def generar_dashboard_premium():
 
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=df_rendimiento.index, y=df_rendimiento['YO_USD'], name="Nekonometrics (USD)", line=dict(color=COLOR_YO, width=3), visible=True))
-    fig.add_trace(go.Scatter(x=df_rendimiento.index, y=f_rendimiento['BENCH_USD'], name="FTAW (USD)", line=dict(color=COLOR_BENCH, width=1.5, dash='dot'), visible=True))
+    fig.add_trace(go.Scatter(x=df_rendimiento.index, y=df_rendimiento['BENCH_USD'], name="FTAW (USD)", line=dict(color=COLOR_BENCH, width=1.5, dash='dot'), visible=True))
     fig.add_trace(go.Scatter(x=df_rendimiento.index, y=df_rendimiento['YO_CLP'], name="Nekonometrics (CLP)", line=dict(color=COLOR_YO, width=3), visible=False))
     fig.add_trace(go.Scatter(x=df_rendimiento.index, y=df_rendimiento['BENCH_CLP'], name="FTAW (CLP)", line=dict(color=COLOR_BENCH, width=1.5, dash='dot'), visible=False))
     fig.add_trace(go.Scatter(x=df_rendimiento.index, y=df_rendimiento['YO_UF'], name="Nekonometrics (Real UF)", line=dict(color=COLOR_YO, width=3), visible=False))
@@ -507,7 +507,7 @@ def generar_dashboard_premium():
                     <div class="multiplier-header"><span>🇺🇸 Dólares Estadounidenses</span><span class="multiplier-badge">USD</span></div>
                     <div class="multiplier-value">{mult_yo_usd:.2f}x</div>
                     <div class="multiplier-pct" style="color: {color_pct_usd};">{sign_usd}{pct_yo_usd:.2f}%</div>
-                    <div class="multiplier-footer">Cada 1€ es hoy <strong>{mult_yo_usd:.2f}€</strong> (FTAW {mult_be_usd:.2f}x)</div>
+                    <div class="multiplier-footer">Cada $1 es hoy <strong>${mult_yo_usd:.2f}</strong> (FTAW {mult_be_usd:.2f}x)</div>
                 </div>
                 <div class="multiplier-card">
                     <div class="multiplier-header"><span>🇨🇱 Pesos Chilenos</span><span class="multiplier-badge">CLP</span></div>
