@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Resumen de Portafolio</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+
+
+    <div class="header">
+        <h1>Nekonometrics: ¿Vale la pena el factor investing?</h1>
+        <p class="tesis">
+            Una cartera factorial contra un índice global pasivo, medido con datos propios. La única pregunta es si los factores pagan el costo y la complejidad.
+        </p>
+
+
+        <p class="header-links">
+            <a href="https://github.com/neko-nix/nekonometrics" target="_blank" rel="noopener noreferrer">⌨️ Código</a>
+            ·
+            <a href="https://github.com/neko-nix/nekonometrics/blob/main/docs/documentation.md" target="_blank" rel="noopener noreferrer">📕 Documentación</a>
+        </p>
+    </div>
+
+    <div class="container">
+
+        <div class="card" id="historico">
+            <h2>📈 Cartera factorial vs. índice global</h2>
+            <p class="card-subtitle">
+                MWR (retorno ponderado por dinero) acumulado de la cartera contra un <strong>fondo espejo</strong>,
+                los mismos aportes, en las mismas fechas y montos, simulados en el
+                <a class="ref" href="https://www.blackrock.com/es/particulares/productos/349410/" target="_blank" rel="noopener noreferrer">iShares FTSE All World UCITS ETF (FTAW)</a>.
+                Los botones alternan entre USD neto, CLP nominal y UF real (CLP ajustado por inflación), y cambian la ventana temporal.
+                Comparación preliminar, ver <a href="#limitaciones">limitaciones</a>.
+            </p>
+            <div class="chart-container chart-container--historico">
+                <iframe src="dashboard_premium.html" title="Evolución Histórica Multidivisa"></iframe>
+            </div>
+        </div>
+
+        <details class="card">
+            <summary><h2>🔍 ¿Qué es Nekonometrics y cómo está armada la comparación?</h2></summary>
+
+            <p>Nekonometrics es una herramienta personal para automatizar el seguimiento, análisis y rebalanceo de una cartera global de renta variable. Consolida transacciones, obtiene información de los ETFs y sus posiciones subyacentes, calcula la evolución en distintas divisas y genera las visualizaciones de esta página.</p>
+
+            <p>La pregunta que motiva el proyecto es comparativa: <strong>¿el sesgo factorial rinde lo suficiente para pagar su costo extra?</strong> No es sólo si rinde más, sino si rinde más <em>después</em> de tres ETFs en vez de uno, del rebalanceo y del riesgo de seguimiento adicional.</p>
+
+            <div class="pilares-container">
+
+                <div class="pilar-card">
+                    <h3>🎯 La apuesta: sesgo factorial</h3>
+                    <p>Exposición deliberada a los factores de valor, tamaño y rentabilidad mediante tres ETFs UCITS de acumulación de
+                        <a href="https://www.avantisinvestors.com/" target="_blank" rel="noopener noreferrer">Avantis</a>:
+                        <a href="https://www.avantisinvestors.com/ucitsetf/avantis-global-equity-ucits-etf/" target="_blank" rel="noopener noreferrer">AVGC</a>,
+                        <a href="https://www.avantisinvestors.com/ucitsetf/avantis-global-small-cap-value-ucits-etf/" target="_blank" rel="noopener noreferrer">AVGS</a> y
+                        <a href="https://www.avantisinvestors.com/ucitsetf/avantis-emerging-markets-equity-ucits-etf/" target="_blank" rel="noopener noreferrer">AVEM</a>.
+                        Contra la tesis alternativa: el índice global ya captura el premio disponible.
+                    </p>
+                </div>
+
+                <div class="pilar-card">
+                    <h3>⚖️ El control: lo que se mantiene</h3>
+                    <p>Ambas partes de la comparación comparten el diseño: UCITS de acumulación domiciliados en Irlanda (dividendos reinvertidos internamente), <em>buy and hold</em>, aportes periódicos, rebalanceo únicamente por aportes, y la misma secuencia de aportes simulada en el
+                        <a href="https://www.blackrock.com/es/particulares/productos/349410/" target="_blank" rel="noopener noreferrer">iShares FTSE All World (FTAW)</a>
+                        como fondo espejo.
+                    </p>
+                </div>
+
+                <div class="pilar-card">
+                    <h3>🚫 El descarte: lo que no se hace</h3>
+                    <p>Sin <em>market timing</em>, sin selección de acciones individuales, sin apalancamiento, sin derivados y sin trading frecuente. Las reglas de asignación son explícitas y el sistema sólo determina dónde va el siguiente aporte. El objetivo es comparar dos tesis de inversión, no generar actividad.</p>
+                </div>
+
+            </div>
+        </details>
+        <div class="grid-2">
+            <div class="card">
+                <h2>🌳 Asignación de Activos</h2>
+                <p class="card-subtitle">Composición actual del portafolio, indicando su sector geográfico, sesgo de factor y el peso que posee cada fondo en el total, además de los costos anuales y las desviaciones del objetivo de cada ETF, priorizando la inyección de capital al que esté más bajo de su proporción designada.</p>
+                
+                <div class="chart-container chart-container--treemap">
+                    <iframe src="bloque1b_treemap_y_factores.html" title="Composición"></iframe>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🧱 Matriz de Estilo de Inversión</h2>
+                <p class="card-subtitle">Distribución cruzada del portafolio basada en la capitalización bursátil y métricas de valor, evidenciando el sesgo sistemático hacia el cuadrante de <b>Small Cap Value</b> vs Large Blend del benchmark.</p>
+                <div class="chart-container chart-container--stylebox">
+                    <iframe src="bloque_2b_style_box.html" title="Matriz Avantis"></iframe>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <h2>🥇 Top 10 Posiciones del Portafolio</h2>
+                <p class="card-subtitle">Ponderación agregada a nivel de empresa emisora. Se calcula la concentración de las primeras 10 posiciones para poder determinar si la diversificación entre miles de empresas es relevante o no con respecto a FTAW.</p>
+                <p style="font-size: 14px; margin-top: -10px; margin-bottom: 15px;">
+                    <a href="holdings_completo.html" style="color: #f0b64b; text-decoration: none; font-weight: bold;">📊 Ver lista completa de holdings →</a>
+                </p>
+                <div class="chart-container chart-container--posiciones">
+                    <iframe src="top_holdings.html" title="Top Holdings"></iframe>
+                </div>
+            </div>
+            <div class="card">
+                <h2>🏢 Comparativa de Sectores Industriales</h2>
+                <p class="card-subtitle">Distribución industrial ponderada del portafolio comparada directamente con FTAW, permitiendo analizar que el sesgo factorial no genere riesgos sectoriales desmedidos.</p>
+                <div class="chart-container chart-container--industrias">
+                    <iframe src="comparativa_sectores_ftaw.html" title="Sectores Yo vs BM"></iframe>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <h2>🔀 Divergencia de Capital (Active Share)</h2>
+                <p class="card-subtitle">Mapeo analítico de las divergencias y solapamiento entre Nekonometrics y FTAW, facilitando la visualización de qué tan similar o distinto es el portafolio realmente.</p>
+                <div class="chart-container chart-container--divergencia">
+                    <iframe src="dona_overlap_puro.html"
+                            title="Solapamiento por nombre y por peso"
+                            loading="lazy"></iframe>
+                </div>
+
+            </div>
+             
+            <div class="card">
+                <h2>💱 Exposición Neta a Divisas</h2>
+                <p class="card-subtitle">Análisis de riesgo cambiario estructural. Muestra las monedas subyacentes de los activos corporativos que generan los flujos de caja, independientemente de la divisa de cotización formal de los ETFs.</p>
+                <div class="chart-container chart-container--divisas">
+                    <iframe src="exposicion_monedas_portafolio.html" title="Exposición a Divisas"></iframe>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🌎 Mapa Interactivo de Distribución Global</h2>
+            <p class="card-subtitle">Concentración geográfica del capital en escala logarítmica para evitar distorsiones por el tamaño de EE.UU. Permite analizar la diversificación en el mundo entero.</p>
+            <p style="font-size: 14px; margin-top: -10px; margin-bottom: 15px;">
+                <a href="paises_completo.html" style="color: #f0b64b; text-decoration: none; font-weight: bold;">📊 Ver desglose detallado por países y empresas líderes →</a>
+            </p>
+            <div class="map-container">
+                <iframe src="mapa_interactivo.html" title="Mapa de Distribución"></iframe>
+            </div>
+        </div>
+
+        
+    <div class="card" id="limitaciones">
+        <h2>🧪 Limitaciones</h2>
+        <ul class="limitaciones">
+            <li><strong>El benchmark es un fondo espejo, no una compra real.</strong> Se simulan las mismas aportaciones en FTAW, pero al precio de mercado del momento, sin precio de ejecución, spread, comisión, ni hora exacta. Su MWR es contrafactual, válido como comparación, no como algo que ocurrió.</li>
+            <li><strong>Un solo camino.</strong> Una sola secuencia de aportes en un solo período. Otra secuencia habría dado otro MWR, no hay repeticiones ni intervalos de confianza.</li>
+            <li><strong>Ventana temporal corta.</strong> Los factores pueden pasar años sin pagar. Un período favorable o desfavorable no cierra la pregunta.</li>
+            <li><strong>Sin ajuste por riesgo.</strong> El retorno por sí solo no dice mucho, importan la volatilidad y el drawdown del camino.</li>
+            <li><strong>No es una recomendación.</strong> Es el registro público de un experimento propio.</li>
+            <li><strong>"Costo extra" no está monetizado.</strong> El mayor mantenimiento (tres ETFs, rebalanceos) se reconoce cualitativamente, pero no se traduce a un número. La comparación es de retorno, no de retorno menos esfuerzo.</li>
+        </ul>
+        <p class="volver"><a href="#historico">↑ Volver a la comparación</a></p>
+    </div>
+
+
+    <footer class="footer-disclaimer">
+        ⚠️ Nekonometrics es un proyecto personal y experimental con fines educativos y de seguimiento de una cartera propia.
+        No constituye asesoría financiera ni recomendación de inversión. Los mercados implican riesgo de pérdida de capital.
+    </footer>
+
+    </div>
+
+
+
+</body>
+</html>
