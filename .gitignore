@@ -3,7 +3,7 @@ README-en.md
 *.html
 *.css
 actualizar_página.sh
-/docs/*
+/docs/preguntas_frecuentes.md
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
