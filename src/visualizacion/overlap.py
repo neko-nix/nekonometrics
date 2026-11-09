@@ -82,72 +82,103 @@ def generar_sankey_overlap_puro(df_tabla, csv_ftaw):
 
 
     
-    color_yo = "#8b0000"         # Rojo Guinda
-    color_ftaw = "#474747"       # Gris Pizarra
-    color_overlap = "#047857"    # Verde Esmeralda
+    pct_nombre   = n_compartidas / n_empresas_ftaw * 100   # ~83%
+    pct_fuera    = 100 - pct_nombre
 
+    # Paleta (misma familia que el treemap)
+    COL_COMUN = "#96660f"   # oro → lo que SÍ comparto
+    COL_PROPIO= "#2a2118"   # bronce oscuro → lo que es sólo mío
+    FONDO     = "#ffffff"
 
-    nodes_labels = [
+    fig = go.Figure()
 
-        f"<b>Neko Money</b><br>100% | {n_empresas_yo:,} empresas", 
-        f"<b>FTAW</b><br>100% | {n_empresas_ftaw:,} empresas",    
-        f"<b>Sólo Neko (Active Share)</b><br>{active_share:.2f}% del capital", 
-        f"<b>Sólo FTAW</b><br>{active_share:.2f}% del capital",      
-        f"<b>Overlap Financiero: {portfolio_overlap:.2f}%</b><br>({n_compartidas:,} empresas comunes)" 
-    ]
-    
-    nodes_colors = [color_yo, color_ftaw, color_yo, color_ftaw, color_overlap]
+    # ── ANILLO EXTERIOR: POR PESO (dinero) ──
+    fig.add_trace(go.Pie(
+        values=[portfolio_overlap, active_share],
+        labels=["Común", "Sólo mío"],
+        hole=0.66,                                      # ← antes: 0.74
+        domain=dict(x=[0, 1], y=[0, 1]),                # ← REEMPLAZA radius=1.00
+        sort=False, direction="clockwise", rotation=0,
+        marker=dict(colors=[COL_COMUN, COL_PROPIO],
+                    line=dict(color=FONDO, width=2)),
+        texttemplate="<b>%{percent}</b>",
+        textfont=dict(size=15, color="white"),
+        textposition="inside",
+        showlegend=False,
+        hovertemplate="<b>Por peso</b><br>%{label}: %{percent}<extra></extra>",
+    ))
 
-    sources = [0, 0, 1, 1]
-    targets = [2, 4, 3, 4]
-    values  = [
-        active_share,     
-        portfolio_overlap,
-        active_share,  
-        portfolio_overlap 
-    ]
-    
-    link_colors = [
-        "rgba(139, 0, 0, 0.4)",
-        "rgba(139, 0, 0, 0.4)", 
-        "rgba(71, 71, 71, 0.4)",
-        "rgba(71, 71, 71, 0.4)" 
-    ]
+    fig.add_trace(go.Pie(
+        values=[pct_nombre, pct_fuera],
+        labels=["En mi cartera", "Fuera"],
+        hole=0.45,                                      # ← antes: 0.28
+        domain=dict(x=[0.20, 0.80], y=[0.20, 0.80]),    # ← REEMPLAZA radius=0.70
+        sort=False, direction="clockwise", rotation=0,
+        marker=dict(colors=[COL_COMUN, COL_PROPIO],
+                    line=dict(color=FONDO, width=2)),
+        texttemplate="<b>%{percent}</b>",
+        textfont=dict(size=14, color="white"),
+        textposition="inside",
+        showlegend=False,
+        hovertemplate="<b>Por nombre</b><br>%{label}: %{percent}<extra></extra>",
+    ))
 
+    # ── El número del centro ──
+    #fig.add_annotation(
+    #    text=f"<b style='font-size:26px;'>{active_share:.0f}%</b><br>"
+    #        f"<span style='font-size:11px; color:#64748b;'>ACTIVE SHARE</span>",
+    #    x=0.5, y=0.5, xref="paper", yref="paper",
+    #    showarrow=False,
+    #)
 
-    
-    fig = go.Figure(data=[go.Sankey(
-        textfont=dict(color="#1e293b", size=13, family="Arial"),
-        node=dict(
-            pad=35,         
-            thickness=35,  
-            line=dict(color="#1e293b", width=1),
-            label=nodes_labels,
-            color=nodes_colors,
-            
-        ),
-        link=dict(
-            source=sources,
-            target=targets,
-            value=values,
-            color=link_colors,
-            hovertemplate="<b>%{source.label}</b> aporta<br><b>%{value:.2f}%</b> a <b>%{target.label}</b><extra></extra>"
-        )
-    )])
-    
     fig.update_layout(
-        #title={
-        #    "text": f"<b>Simetría de Portafolio: Overlap vs. Active Share</b><br><span style='font-size:13px;color:#64748b;'>Análisis macro de asignación y coincidencias financieras reales</span>",
-        #    "font": {"size": 18, "color": "#1e293b", "family": "Arial"},
-        #    "y": 0.93, "x": 0.5, "xanchor": "center"
-        #},
-        plot_bgcolor='white',
-        paper_bgcolor='white',
-        margin=dict(l=40, r=40, t=0, b=40)
+        plot_bgcolor=FONDO, paper_bgcolor=FONDO,
+        margin=dict(l=10, r=10, t=10, b=10),
+        height=420,
+        showlegend=False,
     )
 
 
+        # ── Etiqueta dinámica en el centro de la dona ──
+    fig.add_annotation(
+        text=f"<b style='font-size:30px;'>{active_share:.0f}%</b><br>"
+             f"<span style='font-size:11px; letter-spacing:1px; color:#64748b;'>ACTIVE SHARE</span>",
+        x=0.5, y=0.5, xref="paper", yref="paper",
+        showarrow=False,
+    )
+
+    fig.update_layout(
+        plot_bgcolor=FONDO, paper_bgcolor=FONDO,
+        margin=dict(l=10, r=10, t=10, b=10),
+        height=420,
+        showlegend=False,
+    )
+
+    leyenda_html = f"""
+    <div style="font-family:'Segoe UI',sans-serif; text-align:center;
+                padding:0 20px 18px 20px; background:{FONDO}; margin:0;">
+        <div style="font-size:13px; color:#475569;">
+            <span style="color:#96660f; font-size:16px;">●</span>
+            <b>En común</b> &nbsp;
+            <span style="color:#2a2118; font-size:16px;">●</span>
+            <b>Sólo Neko</b>
+        </div>
+        <div style="font-size:12px; color:#64748b; margin-top:7px; line-height:1.6;">
+            <b>Anillo exterior</b> = % del capital ·
+            <b>Anillo interior</b> = % de las empresas
+        </div>
+        <div style="font-size:12px; color:#94a3b8; margin-top:4px;">
+            {n_compartidas:,} de {n_empresas_ftaw:,} empresas del FTAW
+            ({pct_nombre:.0f}%) · {portfolio_overlap:.1f}% del capital
+        </div>
+    </div>
+    """
+
+
+    
     html_str = fig.to_html(include_plotlyjs="cdn", full_html=True)
+
+    html_str = html_str.replace("</body>", leyenda_html + "</body>")
 
     svg_filter = """
     <body>
@@ -166,21 +197,19 @@ def generar_sankey_overlap_puro(df_tabla, csv_ftaw):
     
 
     custom_css = """
-    <style>
-        text.node-label {
-            text-shadow: none !important;
-            stroke: none !important;
-            filter: url(#badge-blanco); /* 
-        }
-    </style>
+        <style>
+            body { margin: 0; background: #ffffff; }
+            text.node-label { text-shadow: none !important; stroke: none !important; }
+        </style>    
     """
-    
     html_str = html_str.replace("<body>", svg_filter)
     html_str = html_str.replace("</head>", f"{custom_css}</head>")
+
+    
     
 
-    output_html = "sankey_overlap_puro.html"
+    output_html = "dona_overlap_puro.html"
     with open(output_html, "w", encoding="utf-8") as f:
         f.write(html_str)
         
-    print(f"✅ Generado Sankey de solapamiento entre Neko Money y FTAW en {output_html}")
+    print(f"✅ Generado Sankey de solapamiento entre Nekonometrics y FTAW en {output_html}")

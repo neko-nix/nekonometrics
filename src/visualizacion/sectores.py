@@ -170,7 +170,7 @@ def generar_comparativa_sectores_ftaw(df_tabla, csv_ftaw):
     fig.add_trace(go.Bar(
         y=df_sectores['Y_LABEL'], 
         x=df_sectores['PORCENTAJE_YO'],
-        name='Neko Money',
+        name='Nekonometrics',
         orientation='h',
         marker=dict(
             color=df_sectores['PORCENTAJE_YO'], 

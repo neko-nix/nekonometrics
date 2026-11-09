@@ -533,7 +533,7 @@ def generar_top_holdings(carpeta_holdings, csv_rebalanceo):
     with open(output_tabla, "w", encoding="utf-8") as f:
         f.write(html_final)
         
-    print(f"✅ Generada Tabla dinámica con lista completa de holdings de Neko Money en: {output_tabla}")
+    print(f"✅ Generada Tabla dinámica con lista completa de holdings de Nekonometrics en: {output_tabla}")
    
     #print(df_top10)
 
@@ -649,7 +649,7 @@ def generar_top_holdings(carpeta_holdings, csv_rebalanceo):
     fig.add_trace(go.Bar(
         y=df_top10['COMPANY_CLEAN'],
         x=df_top10['POND_WEIGHT'],
-        name='Neko Money',
+        name='Nekonometrics',
         orientation='h',
         marker=dict(
             color=df_top10['POND_WEIGHT'],
@@ -704,7 +704,7 @@ def generar_top_holdings(carpeta_holdings, csv_rebalanceo):
 
     fig.update_layout(
         title={
-            'text': f'<b>Concentración en el Top 10 — Neko Money: {peso_total_top10_yo:.2%} vs FTAW: {peso_total_top10_bench:.2%}</b>',
+            'text': f'<b>Concentración en el Top 10 — Nekonometrics: {peso_total_top10_yo:.2%} vs FTAW: {peso_total_top10_bench:.2%}</b>',
             'font': {'size': 16, 'color': '#1e293b', 'family': 'Arial'},
             'y': 0.06, 'x': 0.5, 'xanchor': 'center'
         },
