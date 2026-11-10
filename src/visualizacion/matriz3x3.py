@@ -133,27 +133,26 @@ def generar_bloque_treemap_y_factores_html(
                 color_dif, badge = ROJO, "▲"
             else:
                 color_dif, badge = VERDE, "✓"
-
             tiles += f"""
             <div style="background:{SUP2}; border:1px solid {BORDE}; border-radius:9px;
-                        padding:13px 15px; display:flex; flex-direction:column; gap:9px;">
-                <div style="display:flex; justify-content:space-between; align-items:baseline;">
-                    <span style="font-family:ui-monospace,SFMono-Regular,monospace; font-size:14px;
+                        padding:10px 12px; display:flex; flex-direction:column; gap:6px;">
+                <div style="display:flex; justify-content:space-between;
+                            align-items:baseline; gap:6px;">
+                    <span style="font-family:ui-monospace,SFMono-Regular,monospace; font-size:13px;
                                  font-weight:700; color:{FUERTE}; letter-spacing:0.3px;">{ticker}</span>
-                    <span style="font-size:13px; font-weight:700; color:{color_dif};">
-                        {badge} {dif:+.1f}%</span>
+                    <span style="font-size:12px; font-weight:700; color:{color_dif};
+                                 white-space:nowrap;">{badge} {dif:+.1f}%</span>
                 </div>
-                <div style="font-size:11px; color:{MUTED};">
-                    Actual <b style="color:{TEXTO};">{actual:.1f}%</b>
-                    &nbsp;·&nbsp;
-                    Objetivo <b style="color:{TEXTO};">{ideal:.1f}%</b>
+                <div style="font-size:10.5px; color:{MUTED}; white-space:nowrap;">
+                    <b style="color:{TEXTO};">{actual:.1f}%</b>
+                    <span style="color:{FAINT};"> → </span>
+                    <b style="color:{TEXTO};">{ideal:.1f}%</b>
                 </div>
-
-                <div style="position:relative; height:8px; background:{BORDE};
-                            border-radius:4px; overflow:hidden;">
+                <div style="position:relative; height:6px; background:{BORDE};
+                            border-radius:3px; overflow:hidden;">
                     <div style="position:absolute; top:0; bottom:0; left:{izq:.1f}%;
                                 width:{w:.1f}%; background:{color_dif};
-                                border-radius:3px;"></div>
+                                border-radius:2px;"></div>
                     <div style="position:absolute; top:0; bottom:0; left:50%;
                                 width:1px; background:{FAINT}; opacity:.85;"></div>
                 </div>
@@ -161,26 +160,24 @@ def generar_bloque_treemap_y_factores_html(
             """
 
         html_tarjeta2 = f"""
-        <div style="background:{SUP}; border:1px solid {BORDE}; border-radius:10px; padding:16px 18px;">
+        <div style="background:{SUP}; border:1px solid {BORDE}; border-radius:10px;
+                    padding:13px 15px;">
             <div style="display:flex; justify-content:space-between; align-items:baseline;
-                        flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+                        flex-wrap:wrap; gap:8px; margin-bottom:10px;">
                 <div>
                     <div style="font-size:11px; font-weight:700; letter-spacing:1.4px;
                                 text-transform:uppercase; color:{ORO_DIM};">
                         Desviaciones del objetivo</div>
-                    <div style="font-size:12px; color:{MUTED}; margin-top:2px;">
+                    <div style="font-size:11px; color:{MUTED}; margin-top:2px;">
                         Peso actual vs. peso ideal</div>
                 </div>
-                <div style="font-size:11px; color:{FAINT};">
+                <div style="font-size:10.5px; color:{FAINT};">
                     <span style="color:{ORO};">▼</span> falta &nbsp;·&nbsp;
                     <span style="color:{ROJO};">▲</span> exceso &nbsp;·&nbsp;
                     <span style="color:{VERDE};">✓</span> ±0.2 pp
                 </div>
             </div>
-            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
-                        gap:10px;">
-                {tiles}
-            </div>
+            <div class="kpi-row">{tiles}</div>
         </div>
         """
 
@@ -200,10 +197,11 @@ def generar_bloque_treemap_y_factores_html(
 
 
     # ── Nogal: escalera de chocolate (techo L 0.06 → blanco 9.4:1) ──
+    # ── Nogal: escalera de chocolate ──
     paleta_colores = {
-        "Desarrollados Core": "#433322",   # nogal          L .035
-        "Desarrollados SCV":  "#32271c",   # nogal claro    L .055  ← protagonista 
-        "Emergentes":         "#56422d",   # tabaco         L .023
+        "Desarrollados Core": "#433322",   # nogal          L .037
+        "Desarrollados SCV":  "#32271c",   # nogal oscuro   L .022
+        "Emergentes":         "#56422d",   # tabaco         L .061  ← el más claro
         "Otros":              "#241c15",   # chocolate      L .012
     }
     fig = px.treemap(
@@ -231,7 +229,7 @@ def generar_bloque_treemap_y_factores_html(
         textfont=dict(size=15, color="#f7f2e4"),
         textposition="middle center",
         marker=dict(
-            line=dict(color="#f7f2e4", width=0),
+            line=dict(color=FONDO, width=2),
             cornerradius=4,
         ),
         hoverlabel=dict(
@@ -241,11 +239,11 @@ def generar_bloque_treemap_y_factores_html(
         ),
     )
     fig.update_layout(
-        margin=dict(l=0, r=0, t=0, b=0),
+        margin=dict(l=2, r=2, t=2, b=2),     # ← simétrico, sin el r:20 raro
         showlegend=False,
-        height=420,
-        plot_bgcolor=FONDO,
-        paper_bgcolor=FONDO,
+        height=380,                            # ← 400 → 380 ✅
+        plot_bgcolor=SUP,
+        paper_bgcolor=SUP,
         font=dict(color=TEXTO, size=12),
         hovermode="closest",
     )
@@ -255,19 +253,64 @@ def generar_bloque_treemap_y_factores_html(
 
   
     bloque_kpi = f"""
-        <div style="margin-top:14px; padding:0 4px 4px 4px;">{html_tarjeta2}</div>
+        <div style="margin-top:12px;">{html_tarjeta2}</div>
     """ if html_tarjeta2 else ""
 
-    html_completo = f"""
-    <div class="bloque-1b-container"
-         style="font-family:'Segoe UI',Tahoma,sans-serif; background:{FONDO};
-                padding:0; border-radius:12px;">
-        <div style="width:100%;">
-            {plot_html_div}
-        </div>
+    html_completo = f"""<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Composición y desviaciones</title>
+<style>
+  *, *::before, *::after {{ box-sizing: border-box; }}
+
+  html {{
+      height: 100%;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+  }}
+
+  body {{
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: FONDO;
+      color: TEXTO;                  /* higiene: nunca heredar negro ✅ */
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      overflow-x: hidden;
+      overflow-y: auto;              /* ← ESTO faltaba 💀→✅ */
+  }}
+
+  .bloque-1b-container {{
+      width: 100%;
+      min-height: 100%;              /* ← min-height, NO height ✅ */
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+  }}
+
+  .kpi-row {{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
+      gap: 8px;
+  }}
+
+  .kpi-row > div {{ min-width: 0; }}    /* ← deja encoger los tiles ✅ */
+
+  .plotly-graph-div {{ width: 100% !important; }}
+</style>
+</head>
+<body>
+    <div class="bloque-1b-container">
+        {plot_html_div}
         {bloque_kpi}
     </div>
-    """
+</body>
+</html>
+"""
 
     output_file = "bloque1b_treemap_y_factores.html"
     with open(output_file, "w", encoding="utf-8") as f:

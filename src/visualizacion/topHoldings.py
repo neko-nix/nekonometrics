@@ -697,7 +697,7 @@ def generar_top_holdings(carpeta_holdings, csv_rebalanceo):
         marker=dict(color='#56422d'),
         text=df_top10['BENCH_WEIGHT'].map(lambda x: f"{x:.2%}" if x > 0 else "0.00%"),
         textposition='outside',
-        textfont=dict(size=12, color='#a89c85', family='Arial'),
+        textfont=dict(size=12, color='#e8e2d4', family='Arial'),
         hovertemplate='<b>%{y}</b><br>Peso FTAW: %{x:.2%}<extra></extra>'
     ))
 
@@ -707,10 +707,10 @@ def generar_top_holdings(carpeta_holdings, csv_rebalanceo):
         x=df_top10['POND_WEIGHT'],
         name='Nekonometrics',
         orientation='h',
-        marker=dict(color='#32271c'),
+        marker=dict(color='#f0b64b'),
         text=df_top10['POND_WEIGHT'].map(lambda x: f"{x:.2%}"),
         textposition='outside',
-        textfont=dict(size=12, color='#a89c85', family='Arial'),
+        textfont=dict(size=12, color='#e8e2d4', family='Arial'),
         hovertemplate='<b>%{y}</b><br>Peso Neko: %{x:.2%}<extra></extra>'
     ))
 
@@ -759,8 +759,8 @@ def generar_top_holdings(carpeta_holdings, csv_rebalanceo):
         },
         barmode='group', bargap=0.4, bargroupgap=0.05,
         margin=dict(l=5, r=0, t=0, b=0),
-        plot_bgcolor='#0f0d0a',
-        paper_bgcolor='#0f0d0a',
+        plot_bgcolor='#17140f',
+        paper_bgcolor='#17140f',
         font=dict(color='#e8e2d4'),
         annotations=anotaciones_holdings,
         legend=dict(

@@ -103,7 +103,7 @@ def generar_esquema_monedas(df_tabla):
 
     colores_dict = {
         # --- BLOQUE NORTEAMÉRICA Y EFECTIVO ---
-        '🇺🇸 USD': '#1e3a8a',  # Azul oscuro institucional (EE.UU. / Caimán / Cash)
+        '🇺🇸 USD': '#3b5fc4',   # ← en vez de #1e3a8a
         
         # --- BLOQUE ANGLOSAJÓN / PACÍFICO (AZULES) ---
         '🇪🇺 EUR': '#0284c7',  # Azul cielo bandera europea
@@ -164,11 +164,11 @@ def generar_esquema_monedas(df_tabla):
         labels=df_final['MONEDA'],
         values=df_final['PESO_NUM'],
         hole=0.6,
-        marker=dict(colors=colores_lista, line=dict(color='white', width=2)),
+        marker=dict(colors=colores_lista, line=dict(color='#0f0d0a', width=3)),
         textinfo='label+percent',
         textposition='outside',
         hovertemplate='<b>Divisa: %{label}</b><br>Exposición Real: %{value:.2f}%<extra></extra>',
-        textfont=dict(size=14, color='#2c3e50')
+        textfont=dict(size=15, color='#e8e2d4', family='Arial')
     )])
 
 
@@ -186,11 +186,24 @@ def generar_esquema_monedas(df_tabla):
         #width=850,
         #height=550, 
         showlegend=False,
-        paper_bgcolor='white',
-        plot_bgcolor='white',
+        paper_bgcolor='#17140f',
+        plot_bgcolor='#17140f',
         margin=dict(l=0, r=0, t=0, b=0)
     )
 
     output_html = "exposicion_monedas_portafolio.html"
     fig.write_html(output_html, include_plotlyjs="cdn")
+
+    # Parche de fondo de página
+    with open(output_html, 'r', encoding='utf-8') as f:
+        html_str = f.read()
+
+    html_str = html_str.replace(
+        "</head>",
+        "<style>html,body{margin:0;padding:0;background:#0f0d0a;"
+        "font-family:'Segoe UI',sans-serif;}</style></head>"
+    )
+
+    with open(output_html, 'w', encoding='utf-8') as f:
+        f.write(html_str)
     print(f"✅ Generada dona de exposición a monedas en: {output_html}")

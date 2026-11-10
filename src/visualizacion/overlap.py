@@ -86,130 +86,159 @@ def generar_sankey_overlap_puro(df_tabla, csv_ftaw):
     pct_fuera    = 100 - pct_nombre
 
     # Paleta (misma familia que el treemap)
-    COL_COMUN = "#96660f"   # oro → lo que SÍ comparto
-    COL_PROPIO= "#2a2118"   # bronce oscuro → lo que es sólo mío
-    FONDO     = "#ffffff"
+    COL_COMUN  = "#56422d"   # marrón oscuro → va al valor [0] = "Común"
+    COL_PROPIO = "#f0b64b"   # dorado       → va al valor [1] = "Sólo mío"
+    
+    FONDO     = "#17140f"
 
     fig = go.Figure()
 
-    # ── ANILLO EXTERIOR: POR PESO (dinero) ──
-    fig.add_trace(go.Pie(
-        values=[portfolio_overlap, active_share],
-        labels=["Común", "Sólo mío"],
-        hole=0.66,                                      # ← antes: 0.74
-        domain=dict(x=[0, 1], y=[0, 1]),                # ← REEMPLAZA radius=1.00
-        sort=False, direction="clockwise", rotation=0,
-        marker=dict(colors=[COL_COMUN, COL_PROPIO],
-                    line=dict(color=FONDO, width=2)),
-        texttemplate="<b>%{percent}</b>",
-        textfont=dict(size=15, color="white"),
-        textposition="inside",
-        showlegend=False,
-        hovertemplate="<b>Por peso</b><br>%{label}: %{percent}<extra></extra>",
+    categorias = ["Capital", "Empresas"]
+    comunes    = [portfolio_overlap, pct_nombre]
+    propios    = [active_share,     pct_fuera]
+
+    fig.add_trace(go.Bar(
+        x=categorias, y=comunes,
+        marker=dict(color='#56422d', line=dict(color=FONDO, width=2)),
+        text=[f"{v:.0f}%" for v in comunes],
+        textposition='auto', insidetextanchor='middle',
+        textfont=dict(size=16, color='#e8e2d4', family='Arial'),
+        name="En común", legendgroup="comun", showlegend=True,
+        cliponaxis=False,
+        hovertemplate="<b>%{x}</b> · en común: %{y:.1f}%<extra></extra>",
     ))
 
-    fig.add_trace(go.Pie(
-        values=[pct_nombre, pct_fuera],
-        labels=["En mi cartera", "Fuera"],
-        hole=0.45,                                      # ← antes: 0.28
-        domain=dict(x=[0.20, 0.80], y=[0.20, 0.80]),    # ← REEMPLAZA radius=0.70
-        sort=False, direction="clockwise", rotation=0,
-        marker=dict(colors=[COL_COMUN, COL_PROPIO],
-                    line=dict(color=FONDO, width=2)),
-        texttemplate="<b>%{percent}</b>",
-        textfont=dict(size=14, color="white"),
-        textposition="inside",
-        showlegend=False,
-        hovertemplate="<b>Por nombre</b><br>%{label}: %{percent}<extra></extra>",
+    fig.add_trace(go.Bar(
+        x=categorias, y=propios,
+        marker=dict(color='#f0b64b', line=dict(color=FONDO, width=2)),
+        text=[f"{v:.0f}%" for v in propios],
+        textposition='auto', insidetextanchor='middle',
+        textfont=dict(size=16, color='#2a2118', family='Arial'),   # oscuro sobre oro ✅
+        name="Diferencial", legendgroup="propio", showlegend=True,
+        cliponaxis=False,
+        hovertemplate="<b>%{x}</b> · diferencial: %{y:.1f}%<extra></extra>",
     ))
 
-    # ── El número del centro ──
-    #fig.add_annotation(
-    #    text=f"<b style='font-size:26px;'>{active_share:.0f}%</b><br>"
-    #        f"<span style='font-size:11px; color:#64748b;'>ACTIVE SHARE</span>",
-    #    x=0.5, y=0.5, xref="paper", yref="paper",
-    #    showarrow=False,
-    #)
-
     fig.update_layout(
+        barmode='stack',
+        bargap=0.52,                       # columnas no tan gordas ✅
         plot_bgcolor=FONDO, paper_bgcolor=FONDO,
-        margin=dict(l=10, r=10, t=10, b=10),
-        height=420,
+        height=480,
+        margin=dict(l=20, r=20, t=45, b=35),
+        xaxis=dict(
+            showgrid=False, zeroline=False,
+            tickfont=dict(size=14, color='#e8e2d4'),
+            ticks='',
+        ),
+        yaxis=dict(
+            range=[0, 100], showgrid=False, zeroline=False,
+            showticklabels=False, ticks='',   # los % ya están adentro ✅
+        ),
+        legend=dict(orientation='h', y=1.16, x=0.5, xanchor='center',
+                    font=dict(size=12, color='#a89c85'),
+                    bgcolor='rgba(0,0,0,0)'),
+    )
+
+
+
+    # ══════════════════════════════════════════════════════════
+    #  1) UNIÓN DE AMBAS CARTERAS  ⚠️ ANTES de fig2
+    # ══════════════════════════════════════════════════════════
+    df_all = pd.merge(
+        df_yo_agrupado, df_ftaw_agrupado,
+        on='LLAVE_UNICA', how='outer'
+    ).fillna(0)
+
+    df_all['DELTA']  = df_all['PESO_YO'] - df_all['PESO_FTAW']
+    df_all['NOMBRE'] = df_all['LLAVE_UNICA'].str.rsplit('_', n=1).str[0]
+
+    print(f"Unión: {len(df_all):,} nombres "
+          f"({len(df_yo_agrupado):,} míos, {len(df_ftaw_agrupado):,} del FTAW)")
+    print(f"Σ PESO_YO   = {df_all['PESO_YO'].sum():.2f}  (debe ser 100)")
+    print(f"Σ PESO_FTAW = {df_all['PESO_FTAW'].sum():.2f}  (debe ser 100)")
+    print(f"Σ|Δ|/2      = {(0.5 * df_all['DELTA'].abs().sum()):.2f}  "
+          f"(debe ser ≈ {active_share:.2f})")
+
+    # ══════════════════════════════════════════════════════════
+    #  2) TOP 10 SOBRE + TOP 10 SUB  (nace acá ✅)
+    # ══════════════════════════════════════════════════════════
+    top = pd.concat([
+        df_all.nlargest(10, 'DELTA'),
+        df_all.nsmallest(10, 'DELTA')
+    ]).drop_duplicates(subset='LLAVE_UNICA').sort_values('DELTA')
+
+    colores = ['#f0b64b' if v > 0 else '#8f5522' for v in top['DELTA']]
+
+    print(f"top: {len(top)} barras  (min {top['DELTA'].min():+.2f} pp, "
+          f"max {top['DELTA'].max():+.2f} pp)")
+
+    # ══════════════════════════════════════════════════════════
+    #  3) fig2  ⚠️ recién acá, con top ya definido ✅
+    # ══════════════════════════════════════════════════════════
+    fig2 = go.Figure(go.Bar(
+        x=top['NOMBRE'], y=top['DELTA'],
+        marker=dict(color=colores, line=dict(color=FONDO, width=1)),
+        hovertemplate="<b>%{x}</b><br>Δ peso: %{y:+.2f} pp<extra></extra>",
+    ))
+
+    fig2.update_layout(
+        plot_bgcolor=FONDO, paper_bgcolor=FONDO,
+        height=540,
+        margin=dict(l=55, r=20, t=45, b=120),
+        bargap=0.35,
+        title=dict(
+            text="Δ de peso vs FTAW · puntos porcentuales",
+            font=dict(size=13, color='#a89c85'),
+            x=0.5, xanchor='center'
+        ),
+        xaxis=dict(tickangle=-55, tickfont=dict(size=10, color='#a89c85'),
+                   showgrid=False, zeroline=True, zerolinecolor='#3d2e20'),
+        yaxis=dict(showgrid=True, gridcolor='#241c14', zeroline=True,
+                   zerolinecolor='#8a7d6a', zerolinewidth=1,
+                   ticksuffix=' pp', tickfont=dict(size=10, color='#8a7d6a')),
         showlegend=False,
     )
 
-
-        # ── Etiqueta dinámica en el centro de la dona ──
-    fig.add_annotation(
-        text=f"<b style='font-size:30px;'>{active_share:.0f}%</b><br>"
-             f"<span style='font-size:11px; letter-spacing:1px; color:#64748b;'>ACTIVE SHARE</span>",
-        x=0.5, y=0.5, xref="paper", yref="paper",
-        showarrow=False,
-    )
-
-    fig.update_layout(
-        plot_bgcolor=FONDO, paper_bgcolor=FONDO,
-        margin=dict(l=10, r=10, t=10, b=10),
-        height=420,
-        showlegend=False,
-    )
-
-    leyenda_html = f"""
-    <div style="font-family:'Segoe UI',sans-serif; text-align:center;
-                padding:0 20px 18px 20px; background:{FONDO}; margin:0;">
-        <div style="font-size:13px; color:#475569;">
-            <span style="color:#96660f; font-size:16px;">●</span>
-            <b>En común</b> &nbsp;
-            <span style="color:#2a2118; font-size:16px;">●</span>
-            <b>Sólo Neko</b>
+    # ══════════════════════════════════════════════════════════
+    #  4) HTMLs
+    # ══════════════════════════════════════════════════════════
+    header_html = f"""
+    <div style="font-family:'Segoe UI',sans-serif; background:{FONDO};
+                padding:14px 0 0 0; text-align:center;">
+        <div style="font-size:34px; color:#f0b64b; font-weight:600; line-height:1.1;">
+            {active_share:.0f}%
         </div>
-        <div style="font-size:12px; color:#64748b; margin-top:7px; line-height:1.6;">
-            <b>Anillo exterior</b> = % del capital ·
-            <b>Anillo interior</b> = % de las empresas
-        </div>
-        <div style="font-size:12px; color:#94a3b8; margin-top:4px;">
-            {n_compartidas:,} de {n_empresas_ftaw:,} empresas del FTAW
-            ({pct_nombre:.0f}%) · {portfolio_overlap:.1f}% del capital
+        <div style="font-size:10px; letter-spacing:2px; color:#a89c85;
+                    margin-top:2px;">ACTIVE SHARE</div>
+        <div style="font-size:12px; color:#8a7d6a; margin-top:8px;">
+            {n_compartidas:,} de {n_empresas_ftaw:,} empresas del FTAW <br>
+            {portfolio_overlap:.1f}% del capital replicado
         </div>
     </div>
     """
 
+    leyenda_html = f"""
 
-    
-    html_str = fig.to_html(include_plotlyjs="cdn", full_html=True)
-
-    html_str = html_str.replace("</body>", leyenda_html + "</body>")
-
-    svg_filter = """
-    <body>
-    <svg width="0" height="0" style="position: absolute;">
-      <defs>
-        <filter x="-0.08" y="-0.05" width="1.16" height="1.1" id="badge-blanco">
-          <feFlood flood-color="white" flood-opacity="0.90" result="bg" />
-          <feMerge>
-            <feMergeNode in="bg" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
-    </svg>
     """
-    
 
     custom_css = """
         <style>
-            body { margin: 0; background: #ffffff; }
-            text.node-label { text-shadow: none !important; stroke: none !important; }
-        </style>    
+            body { margin: 0; background: #0f0d0a; }
+        </style>
     """
-    html_str = html_str.replace("<body>", svg_filter)
-    html_str = html_str.replace("</head>", f"{custom_css}</head>")
 
-    
-    
+    # ══════════════════════════════════════════════════════════
+    #  5) ENSAMBLADO
+    # ══════════════════════════════════════════════════════════
+    #fig2_html = fig2.to_html(full_html=False, include_plotlyjs=False)
 
+    html_str = fig.to_html(include_plotlyjs="cdn", full_html=True)
+    html_str = html_str.replace("</head>", custom_css + "</head>")
+    html_str = html_str.replace("<body>", "<body>" + header_html, 1)
+    #html_str = html_str.replace("</body>", fig2_html + leyenda_html + "</body>")
+    html_str = html_str.replace("</body>", leyenda_html + "</body>")
     output_html = "dona_overlap_puro.html"
     with open(output_html, "w", encoding="utf-8") as f:
         f.write(html_str)
-        
-    print(f"✅ Generado Sankey de solapamiento entre Nekonometrics y FTAW en {output_html}")
+
+    print(f"✅ Overlap Nekonometrics vs FTAW → {output_html}")

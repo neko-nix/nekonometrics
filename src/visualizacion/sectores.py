@@ -142,7 +142,7 @@ def generar_comparativa_sectores_ftaw(df_tabla, csv_ftaw):
     df_sectores['DIFERENCIA'] = df_sectores['PORCENTAJE_YO'] - df_sectores['PORCENTAJE_FTAW']
     def generar_etiqueta_eje(row):
         dif = row['DIFERENCIA']
-        color = "#15803d" if dif > 0 else ("#e74c3c" if dif < 0 else "#95a5a6")
+        color = "#4ade80" if dif > 0 else ("#f87171" if dif < 0 else "#a89c85")
         signo = "+" if dif > 0 else ""
         return f"{row['SECTOR']} <br><span style='font-size:12px; color:{color};'><b>Dif: {signo}{dif:.2f}%</b></span>"
     
@@ -151,67 +151,54 @@ def generar_comparativa_sectores_ftaw(df_tabla, csv_ftaw):
  
     
     fig = go.Figure()
-    max_weight = max(df_sectores['PORCENTAJE_FTAW'].max(), df_sectores['PORCENTAJE_YO'].max())
+
     fig.add_trace(go.Bar(
-        y=df_sectores['Y_LABEL'], 
+        y=df_sectores['Y_LABEL'],
         x=df_sectores['PORCENTAJE_FTAW'],
         name='FTAW',
         orientation='h',
-        marker=dict(
-            color=df_sectores['PORCENTAJE_FTAW'], 
-            colorscale='greys',           
-            cauto=False,                   
-            cmin=-10,                   
-            cmax=max_weight
-        ),
-        hovertemplate='%{y}<br>FTAW: %{x:.2f}%<extra></extra>'
+        marker=dict(color='#56422d'),
+        customdata=df_sectores['SECTOR'],
+        hovertemplate='%{customdata}<br>FTAW: %{x:.2f}%<extra></extra>'
     ))
 
     fig.add_trace(go.Bar(
-        y=df_sectores['Y_LABEL'], 
+        y=df_sectores['Y_LABEL'],
         x=df_sectores['PORCENTAJE_YO'],
         name='Nekonometrics',
         orientation='h',
-        marker=dict(
-            color=df_sectores['PORCENTAJE_YO'], 
-            colorscale='reds',       
-            cauto=False,                   
-            cmin=-10,                   
-            cmax=max_weight
-              
-        ),
-        hovertemplate='%{y}<br>Nekonometrics: %{x:.2f}%<extra></extra>'
+        marker=dict(color='#f0b64b'),
+        customdata=df_sectores['SECTOR'],
+        hovertemplate='%{customdata}<br>Nekonometrics: %{x:.2f}%<extra></extra>'
     ))
 
     fig.update_layout(
-        #title={
-        #    'text': '<b>Asignación Sectorial: Mi Portafolio vs. FTAW (iShares)</b>',
-        #    'font': {'size': 16, 'color': '#2c3e50', 'family': 'Arial'},
-        #    'y': 0.95, 'x': 0.5, 'xanchor': 'center'
-        #},
         barmode='group',
-        bargap=0.15,      
-        bargroupgap=0.05,   
-        #height=650,   
-        plot_bgcolor='white',
-        paper_bgcolor='white',
-        legend=dict(orientation="h", yanchor="bottom", y=-0.12, xanchor="center", x=0.5),
-        margin=dict(l=0, r=0, t=0, b=0) 
-        #margin=dict(l=200, r=20, t=60, b=60) # Aumenté margen izquierdo por si el texto es largo
+        bargap=0.25,
+        bargroupgap=0.08,
+        plot_bgcolor='#17140f',
+        paper_bgcolor='#17140f',
+        legend=dict(
+            orientation="h", yanchor="bottom", y=-0.12,
+            xanchor="center", x=0.5,
+            font=dict(color='#e8e2d4', size=12)
+        ),
+        margin=dict(l=0, r=10, t=0, b=0)
     )
 
-    fig.update_xaxes(showgrid=True, gridcolor='#f5f7f8', ticksuffix='%', zeroline=True, zerolinecolor='black')
-    
+    fig.update_xaxes(
+        showgrid=True, gridcolor='#2a2118',
+        ticksuffix='%',
+        zeroline=True, zerolinecolor='#3d2e20',
+        tickfont=dict(color='#a89c85', size=11)
+    )
 
     fig.update_yaxes(
         showgrid=False,
+        automargin=True,
         categoryorder='array',
         categoryarray=df_sectores['Y_LABEL'],
-        tickfont=dict(
-            size=15,  
-            color='#2c3e50',
-            family='Arial'
-        )
+        tickfont=dict(size=14, color='#e8e2d4', family='Arial')
     )
 
     output_html = "comparativa_sectores_ftaw.html"

@@ -66,83 +66,142 @@ def generar_reporte_paises(df_tabla, nombre_salida="tabla_paises.html"):
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
         <link rel="stylesheet" type="text/css" href="styles.css">
         <style>
+            /* ── Base ── */
             body {{
-                background-color: transparent !important;
+                background-color: transparent !important;   /* ← NO TOCAR: va en iframe */
                 margin: 0;
                 padding: 0;
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
                 font-size: 14px;
-                color: #30363b;
+                color: #e8e2d4;
             }}
-            
 
+            /* ── Tabla ── */
             #tabla-paises {{
                 width: 100% !important;
                 margin-top: 10px !important;
                 border-collapse: collapse !important;
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
             }}
-            
+
             #tabla-paises thead th {{
-                background-color: #8b0000 !important;
-                color: white !important;
-                font-size: 14px !important; /* Forzar el tamaño idéntico */
+                background-color: #1f1913 !important;
+                color: #f0b64b !important;
+                font-size: 14px !important;
                 font-weight: 600 !important;
                 padding: 11px 12px !important;
-                border-bottom: 2px solid #500000 !important;
+                border-bottom: 2px solid #3d2e20 !important;
                 text-align: left !important;
+                background-image: none !important;   /* apaga las flechas PNG invisibles */
             }}
-            
+
             #tabla-paises tbody td {{
-                font-size: 14px !important; 
+                font-size: 14px !important;
                 padding: 10px 12px !important;
-                border-bottom: 1px solid #ecf0f1 !important;
+                border-bottom: 1px solid #241c14 !important;
                 line-height: 1.4 !important;
+                color: #d8d1c2 !important;
             }}
-            
+
             #tabla-paises tbody tr:nth-child(even) {{
-                background-color: #f9f9f9 !important;
+                background-color: #14100b !important;
             }}
             #tabla-paises tbody tr:hover {{
-                background-color: #f1f1f1 !important;
+                background-color: #2a2118 !important;
             }}
-            
+
+            /* ── Flechas de orden ── */
+            #tabla-paises thead th.sorting::after      {{ content: " ⇅"; font-size: 10px; color: #6b5d4a; }}
+            #tabla-paises thead th.sorting_asc::after  {{ content: " ▲"; font-size: 10px; color: #f0b64b; }}
+            #tabla-paises thead th.sorting_desc::after {{ content: " ▼"; font-size: 10px; color: #f0b64b; }}
+
+            /* ── Botón de columnas ── */
             .dt-button.buttons-colvis {{
-                background: #8b0000 !important;
-                color: white !important;
-                border: 1px solid #500000 !important;
-                border-radius: 4px !important;
+                background: #1f1913 !important;
+                color: #f0b64b !important;
+                border: 1px solid #3d2e20 !important;
+                border-radius: 6px !important;
                 padding: 6px 12px !important;
                 font-size: 14px !important;
-                font-weight: bold !important;
+                font-weight: 600 !important;
                 margin-bottom: 10px !important;
             }}
             .dt-button.buttons-colvis:hover {{
-                background: #500000 !important;
+                background: #2a2118 !important;
+                border-color: #f0b64b !important;
             }}
-            
-            .dataTables_wrapper .dataTables_filter {{
-                font-size: 14px !important;
+
+            /* ── Menú desplegable del colvis (viene blanco) ── */
+            .dt-button-collection {{
+                background: #1f1913 !important;
+                border: 1px solid #3d2e20 !important;
+                border-radius: 6px !important;
             }}
+            .dt-button-collection a.dt-button {{
+                color: #e8e2d4 !important;
+                background: transparent !important;
+            }}
+            .dt-button-collection a.dt-button:hover {{
+                background: #2a2118 !important;
+                color: #f0b64b !important;
+            }}
+
+            /* ── Buscador ── */
+            .dataTables_wrapper .dataTables_filter {{ font-size: 14px !important; color: #a89c85; }}
             .dataTables_wrapper .dataTables_filter input {{
-                border: 1px solid #bdc3c7 !important;
-                border-radius: 4px !important;
+                background: #14100b !important;
+                border: 1px solid #3d2e20 !important;
+                border-radius: 6px !important;
                 padding: 5px 10px !important;
                 font-size: 14px !important;
+                color: #e8e2d4 !important;
             }}
             .dataTables_wrapper .dataTables_filter input:focus {{
-                border-color: #8b0000 !important;
+                border-color: #f0b64b !important;
                 outline: none;
             }}
-            
+            .dataTables_wrapper .dataTables_filter input::placeholder {{ color: #6b5d4a; }}
+
+            /* ── Textos nativos de DataTables (vienen gris oscuro) ── */
             .dataTables_wrapper .dataTables_info,
-            .dataTables_wrapper .dataTables_paginate {{
+            .dataTables_wrapper .dataTables_length,
+            .dataTables_wrapper .dataTables_length label,
+            .dataTables_wrapper .dataTables_filter label {{
+                color: #a89c85 !important;
                 font-size: 14px !important;
             }}
-            .dataTables_wrapper .dataTables_paginate .paginate_button.current {{
-                background: #8b0000 !important;
-                color: white !important;
-                border: 1px solid #8b0000 !important;
+
+            .dataTables_wrapper .dataTables_length select {{
+                background: #14100b !important;
+                color: #e8e2d4 !important;
+                border: 1px solid #3d2e20 !important;
+                border-radius: 6px !important;
+                padding: 4px 8px !important;
+            }}
+
+            /* ── Paginación ── */
+            .dataTables_wrapper .dataTables_paginate {{ font-size: 14px !important; }}
+            .dataTables_wrapper .dataTables_paginate .paginate_button {{
+                color: #a89c85 !important;
+                background: transparent !important;
+                border: 1px solid transparent !important;
+                border-radius: 6px !important;
+            }}
+            .dataTables_wrapper .dataTables_paginate .paginate_button:hover {{
+                background: #2a2118 !important;
+                color: #f0b64b !important;
+                border-color: #3d2e20 !important;
+            }}
+            .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+            .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {{
+                background: #f0b64b !important;
+                color: #1f1710 !important;
+                border: 1px solid #f0b64b !important;
+            }}
+            .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+            .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {{
+                color: #6b5d4a !important;
+                background: transparent !important;
             }}
         </style>
     </head>
