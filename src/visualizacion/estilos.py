@@ -15,6 +15,9 @@ MUTED   = "#a89c85"
 FAINT   = "#7a705e"
 ORO     = "#f0b64b"
 ORO_DIM = "#b8862f"
+BORDE    = "#2a2018"   # era #2b2519
+FAINT    = "#8a8070"   # era #7a705e  (3.8:1 → 4.7:1)
+ORO_DIM  = "#c89a45"   # era #b8862f  (3.9:1 → 6.2:1 en labels de 11px)
 
 MATRICES_ORIGINALES = {
     "BENCHMARK": np.array([[0, 0, 0], [5, 7, 4], [22, 36, 25]]),
@@ -65,21 +68,36 @@ def exportar_bloque_style_box_html(ruta_csv, ruta_salida_html="bloque_2b_style_b
     global_max = float(max(matriz_portafolio.max(), matriz_bench.max()))
 
  
-    # ── Escalas: dorado = vos · gris = referencia ──
+    GAMMA = 0.65
+
+    def curva(m, zmax):
+        return (np.clip(m, 0, zmax) / zmax) ** GAMMA
+
+    max_port  = float(matriz_portafolio.max()) or 1.0
+    max_bench = float(matriz_bench.max())     or 1.0
+
+    # ── Rampa re-espaciada para gamma: zona segura hasta .60, salto .60→.66 ──
     COLORSCALE_ORO = [
-        [0.00, "#14110d"],
-        [0.22, "#2b2114"],
-        [0.48, "#5c4112"],
-        [0.72, "#9a6a1c"],
-        [0.90, "#c8973a"],
-        [1.00, "#f5c862"],
+        [0.00, "#17120d"],   # L .008
+        [0.16, "#241c14"],   # L .012
+        [0.32, "#33271b"],   # L .023
+        [0.46, "#4a3826"],   # L .040
+        [0.60, "#7f6040"],   # L .140   ← fin zona crema (5.3:1 ✅)
+        [0.66, "#a8906f"],   # L .280   ← salto: empieza zona oscura (5.7:1 ✅)
+        [0.82, "#cfa869"],   # L .423
+        [1.00, "#f2cb7d"],   # L .600   ORO
     ]
+
+        # ── Rampa re-espaciada para gamma: zona segura hasta .60, salto .60→.66 ──
+
     COLORSCALE_GRIS = [
-        [0.00, "#14110d"],
-        [0.30, "#282420"],
-        [0.60, "#4a443a"],
-        [0.85, "#7d7568"],
-        [1.00, "#b8ae9c"],
+        [0.00, "#17120d"],
+        [0.22, "#26221c"],
+        [0.42, "#3a352d"],
+        [0.60, "#5a5247"],
+        [0.66, "#8a7f6c"],
+        [0.82, "#ab9f8a"],
+        [1.00, "#c4b8a2"],
     ]
 
     fig = make_subplots(
@@ -102,48 +120,47 @@ def exportar_bloque_style_box_html(ruta_csv, ruta_salida_html="bloque_2b_style_b
     # ── 2. PANEL 1: Nekonometrics (oro) — SIN text ──
     fig.add_trace(
         go.Heatmap(
-            z=matriz_portafolio, x=estilos, y=tamanos,
+            x=estilos, y=tamanos,
+            z=curva(matriz_portafolio, max_port),   # posición 0-1
+            customdata=matriz_portafolio,           # valor real
             colorscale=COLORSCALE_ORO,
             showscale=False,
             zmin=0, zmax=global_max,
             xgap=3, ygap=3,
-            hovertemplate="Nekonometrics · %{y} %{x}: <b>%{z:.1f}%</b><extra></extra>"
+            hovertemplate="Nekonometrics · %{y} %{x}: <b>%{customdata:.1f}%</b><extra></extra>"
         ),
         row=1, col=1
     )
 
-    # ── 3. PANEL 2: FTAW (gris) — SIN text ──
-    fig.add_trace(
-        go.Heatmap(
-            z=matriz_bench, x=estilos, y=tamanos,
-            colorscale=COLORSCALE_GRIS,
-            showscale=False,
-            zmin=0, zmax=global_max,
-            xgap=3, ygap=3,
-            hovertemplate="FTAW · %{y} %{x}: <b>%{z:.1f}%</b><extra></extra>"
-        ),
-        row=1, col=2
-    )
+    fig.add_trace(go.Heatmap(
+        z=curva(matriz_portafolio, max_port), customdata=matriz_portafolio,
+        x=estilos, y=tamanos, colorscale=COLORSCALE_ORO,
+        showscale=False, zmin=0, zmax=1, xgap=3, ygap=3,
+        hovertemplate="Nekonometrics · %{y} %{x}: <b>%{customdata:.1f}%</b><extra></extra>",
+    ), row=1, col=1)
 
+    fig.add_trace(go.Heatmap(
+        z=curva(matriz_bench, max_bench), customdata=matriz_bench,
+        x=estilos, y=tamanos, colorscale=COLORSCALE_GRIS,
+        showscale=False, zmin=0, zmax=1, xgap=3, ygap=3,
+        hovertemplate="FTAW · %{y} %{x}: <b>%{customdata:.1f}%</b><extra></extra>",
+    ), row=1, col=2)
     # ── 4. Números: una annotation por celda, con su propio color ──
-    def agregar_etiquetas(matriz, fila, col, umbral):
-        piso = global_max if global_max else 1.0
+    def agregar_etiquetas(matriz, zmax, fila, col, umbral=0.63):
         for i, tam in enumerate(tamanos):
             for j, est in enumerate(estilos):
-                v = matriz[i][j]
+                v   = matriz[i][j]
+                pos = (max(v, 0) / zmax) ** GAMMA
                 fig.add_annotation(
                     x=est, y=tam, row=fila, col=col,
-                    text=(f"<b>{v:.1f}%</b>" if v > 0.1 else "<b>0.0%</b>"),
+                    text=f"<b>{v:.1f}%</b>",
                     showarrow=False,
-                    font=dict(
-                        size=14,
-                        family="'Segoe UI',Arial,sans-serif",
-                        color=("#1a1408" if (v / piso) > umbral else "#f7f2e4"),
-                    ),
+                    font=dict(size=14, family="'Segoe UI',Arial,sans-serif",
+                            color=("#1f1710" if pos > umbral else "#f7f2e4")),
                 )
 
-    agregar_etiquetas(matriz_portafolio, 1, 1, 0.80)
-    agregar_etiquetas(matriz_bench,     1, 2, 0.88)
+    agregar_etiquetas(matriz_portafolio, max_port,  1, 1)
+    agregar_etiquetas(matriz_bench,     max_bench,  1, 2)
 
     # ── 5. Layout ──
     fig.update_layout(

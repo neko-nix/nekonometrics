@@ -8,20 +8,20 @@ import sqlite3
 
 
 # ── TEMA OSCURO DORADO ──
-FONDO   = "#0f0d0a"
-SUP     = "#17140f"
-BORDE   = "#2b2519"
-BORDE_2 = "#221d15"
-TEXTO   = "#e8e2d4"
-FUERTE  = "#f7f2e4"
-MUTED   = "#a89c85"
-FAINT   = "#7a705e"
-ORO      = "#f0b64b"   # el dorado validado
-ORO_DIM  = "#b8862f"   # dorado oscuro: se lee en textos chicos (6.4:1)
-ORO_BRIGHT = "#ffd280" # para hovers
-VERDE   = "#4ade80"
-ROJO    = "#f87171"
-SUP2    = "#1f1b14"   # superficie de los mini-tiles
+FONDO     = "#0f0d0a"
+SUP       = "#17140f"
+SUP2      = "#1f1b14"
+BORDE     = "#2a2018"   # ← alineado al CSS
+BORDE_2   = "#221d15"
+TEXTO     = "#e8e2d4"
+FUERTE    = "#f7f2e4"
+MUTED     = "#a89c85"
+FAINT     = "#8a8070"   # ← alineado al CSS (era #7a705e, 3.8:1)
+ORO       = "#f0b64b"
+ORO_DIM   = "#c89a45"   # ← 6.2:1 (era #b8862f, 3.9:1)
+ORO_BRIGHT= "#ffd280"
+VERDE     = "#8fd18a"   # ← salvia (era neón)
+ROJO      = "#e8887a"   # ← salmon (era neón)
 
 
 
@@ -121,7 +121,11 @@ def generar_bloque_treemap_y_factores_html(
             ideal  = row["IDEAL_NUM"]
             actual = row["PROP_NUM"]
             dif    = row["DIF_REBALANCEO"]
-            ancho  = abs(dif) / max_abs * 100
+
+            # ── Barra divergente: media pista = max_abs ──
+            w   = abs(dif) / max_abs * 50.0
+            w   = max(w, 0.9) if abs(dif) > 0.05 else 0.0
+            izq = 50.0 if dif >= 0 else 50.0 - w
 
             if dif < -0.2:
                 color_dif, badge = ORO, "▼"
@@ -144,9 +148,14 @@ def generar_bloque_treemap_y_factores_html(
                     &nbsp;·&nbsp;
                     Objetivo <b style="color:{TEXTO};">{ideal:.1f}%</b>
                 </div>
-                <div style="height:6px; background:{BORDE}; border-radius:3px; overflow:hidden;">
-                    <div style="height:100%; width:{ancho:.0f}%; background:{color_dif};
+
+                <div style="position:relative; height:8px; background:{BORDE};
+                            border-radius:4px; overflow:hidden;">
+                    <div style="position:absolute; top:0; bottom:0; left:{izq:.1f}%;
+                                width:{w:.1f}%; background:{color_dif};
                                 border-radius:3px;"></div>
+                    <div style="position:absolute; top:0; bottom:0; left:50%;
+                                width:1px; background:{FAINT}; opacity:.85;"></div>
                 </div>
             </div>
             """
@@ -189,12 +198,13 @@ def generar_bloque_treemap_y_factores_html(
 
 
 
-    # ── Charcoal profundo + filete dorado ──
+
+    # ── Nogal: escalera de chocolate (techo L 0.06 → blanco 9.4:1) ──
     paleta_colores = {
-        "Desarrollados Core": "#14110d",   # casi el fondo: lo define el marco
-        "Desarrollados SCV":  "#201b14",   # el más claro = protagonista
-        "Emergentes":         "#1a1611",   # intermedio
-        "Otros":              "#12100c",
+        "Desarrollados Core": "#433322",   # nogal          L .035
+        "Desarrollados SCV":  "#32271c",   # nogal claro    L .055  ← protagonista 
+        "Emergentes":         "#56422d",   # tabaco         L .023
+        "Otros":              "#241c15",   # chocolate      L .012
     }
     fig = px.treemap(
         df, path=["TICKER_ORIGINAL"], values="PROP_NUM",
@@ -221,7 +231,7 @@ def generar_bloque_treemap_y_factores_html(
         textfont=dict(size=15, color="#f7f2e4"),
         textposition="middle center",
         marker=dict(
-            line=dict(color="#b8862f", width=2),
+            line=dict(color="#f7f2e4", width=0),
             cornerradius=4,
         ),
         hoverlabel=dict(

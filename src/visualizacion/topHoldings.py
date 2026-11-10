@@ -275,95 +275,153 @@ def generar_top_holdings(carpeta_holdings, csv_rebalanceo):
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
         
-        <style>
-            
-            body {{
-                background-color: transparent !important;
-                margin: 0;
-                padding: 0;
-                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-                font-size: 14px;
-                color: #30363b;
-            }}
-            
-           
-            #tabla-dinamica {{
-                width: 100% !important;
-                margin-top: 10px !important;
-                border-collapse: collapse !important;
-                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-            }}
-            
-           
-            #tabla-dinamica thead th {{
-                background-color: #8b0000 !important;
-                color: white !important;
-                font-size: 14px !important; /* Forzar el tamaño idéntico */
-                font-weight: 600 !important;
-                padding: 11px 12px !important;
-                border-bottom: 2px solid #500000 !important;
-                text-align: left !important;
-            }}
-            
-            
-            #tabla-dinamica tbody td {{
-                font-size: 14px !important; /* Evita que DataTables achique la letra */
-                padding: 10px 12px !important;
-                border-bottom: 1px solid #ecf0f1 !important;
-                line-height: 1.4 !important;
-            }}
-            
-            
-            #tabla-dinamica tbody tr:nth-child(even) {{
-                background-color: #f9f9f9 !important;
-            }}
-            #tabla-dinamica tbody tr:hover {{
-                background-color: #f1f1f1 !important;
-            }}
-            
-          
-            .dataTables_wrapper .dataTables_filter {{
-                font-size: 14px !important;
-            }}
-            .dataTables_wrapper .dataTables_filter input {{
-                border: 1px solid #bdc3c7 !important;
-                border-radius: 4px !important;
-                padding: 5px 10px !important;
-                margin-left: 8px !important;
-                font-size: 14px !important;
-            }}
-            .dataTables_wrapper .dataTables_filter input:focus {{
-                border-color: #8b0000 !important;
-                outline: none !important;
-            }}
-            
-          
-            .dataTables_wrapper .dataTables_info,
-            .dataTables_wrapper .dataTables_paginate {{
-                font-size: 14px !important;
-            }}
-            .dataTables_wrapper .dataTables_paginate .paginate_button.current {{
-                background: #8b0000 !important;
-                color: white !important;
-                border: 1px solid #8b0000 !important;
-                border-radius: 4px !important;
-            }}
-            
-            
-            .dt-button.buttons-colvis {{
-                background: #8b0000 !important;
-                color: white !important;
-                border: 1px solid #500000 !important;
-                border-radius: 4px !important;
-                padding: 6px 12px !important;
-                font-size: 14px !important;
-                font-weight: bold !important;
-                margin-bottom: 15px !important;
-            }}
-            .dt-button.buttons-colvis:hover {{
-                background: #500000 !important;
-            }}
-        </style>
+    <style>
+        :root {{
+            --bg:      #0f0d0a;
+            --surface: #17140f;
+            --surface2:#1f1b14;
+            --tabaco:  #241c14;
+            --border:  #2a2018;
+            --border2: #3d2f22;
+            --bronce:  #54402c;
+            --text:    #e8e2d4;
+            --strong:  #f7f2e4;
+            --muted:   #a89c85;
+            --faint:   #8a8070;
+            --oro:     #f0b64b;
+            --oro-br:  #ffd280;
+            --oro-dim: #c89a45;
+            --ink:     #1f1710;   /* texto SOBRE oro */
+        }}
+
+        body {{
+            background-color: transparent !important;
+            margin: 0; padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 14px;
+            color: var(--text);
+        }}
+
+        #tabla-dinamica {{
+            width: 100% !important;
+            margin-top: 10px !important;
+            border-collapse: collapse !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }}
+
+        /* ── CABECERA: oro sobre tabaco ── */
+        #tabla-dinamica thead th {{
+            background-color: var(--tabaco) !important;
+            color: var(--oro) !important;
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            padding: 11px 12px !important;
+            border-bottom: 2px solid var(--bronce) !important;
+            text-align: left !important;
+        }}
+
+        /* ── CELDAS ── */
+        #tabla-dinamica tbody td {{
+            font-size: 14px !important;
+            padding: 10px 12px !important;
+            border-bottom: 1px solid var(--border) !important;
+            color: var(--text) !important;
+            line-height: 1.4 !important;
+        }}
+        #tabla-dinamica tbody tr:nth-child(even) {{
+            background-color: rgba(240, 182, 75, 0.030) !important;
+        }}
+        #tabla-dinamica tbody tr:hover {{
+            background-color: rgba(240, 182, 75, 0.070) !important;
+        }}
+
+        /* ── FILTRO / BUSCADOR ── */
+        .dataTables_wrapper .dataTables_filter {{ font-size: 14px !important; color: var(--muted) !important; }}
+        .dataTables_wrapper .dataTables_filter input {{
+            background: var(--surface) !important;
+            border: 1px solid var(--border2) !important;
+            border-radius: 4px !important;
+            padding: 5px 10px !important;
+            margin-left: 8px !important;
+            font-size: 14px !important;
+            color: var(--text) !important;
+        }}
+        .dataTables_wrapper .dataTables_filter input:focus {{
+            border-color: var(--oro) !important;
+            outline: none !important;
+            box-shadow: 0 0 0 2px rgba(240,182,75,0.15) !important;
+        }}
+
+        /* ── SELECTOR "10 / 15 / 25" (era blanco puro) ── */
+        .dataTables_wrapper select,
+        .dataTables_wrapper input {{
+            background: var(--surface) !important;
+            color: var(--text) !important;
+            border: 1px solid var(--border2) !important;
+            border-radius: 4px !important;
+        }}
+
+        /* ── INFO + PAGINACIÓN ── */
+        .dataTables_wrapper .dataTables_info,
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_paginate {{
+            font-size: 14px !important;
+            color: var(--muted) !important;
+        }}
+        .dataTables_wrapper .dataTables_paginate .paginate_button {{
+            color: var(--muted) !important;
+            border: 1px solid transparent !important;
+            border-radius: 4px !important;
+        }}
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {{
+            background: rgba(240,182,75,0.12) !important;
+            color: var(--oro) !important;
+            border-color: var(--border2) !important;
+        }}
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {{
+            background: var(--oro) !important;
+            color: var(--ink) !important;
+            border: 1px solid var(--oro) !important;
+            border-radius: 4px !important;
+            font-weight: 700 !important;
+        }}
+        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {{
+            color: var(--faint) !important;
+            background: transparent !important;
+        }}
+
+        /* ── BOTÓN "COLUMNAS VISIBLES": oro con tinta oscura ── */
+        .dt-button.buttons-colvis {{
+            background: var(--oro) !important;
+            color: var(--ink) !important;
+            border: 1px solid var(--oro) !important;
+            border-radius: 4px !important;
+            padding: 6px 12px !important;
+            font-size: 14px !important;
+            font-weight: 700 !important;
+            margin-bottom: 15px !important;
+        }}
+        .dt-button.buttons-colvis:hover {{
+            background: var(--oro-br) !important;
+            border-color: var(--oro-br) !important;
+        }}
+
+        /* ── FLECHITAS DE ORDEN: invisibles en oscuro (esto las reemplaza) ── */
+        table.dataTable thead th.sorting,
+        table.dataTable thead th.sorting_asc,
+        table.dataTable thead th.sorting_desc {{ background-image: none !important; }}
+        table.dataTable thead th.sorting::after {{
+            content: "⇅"; float: right; opacity: .30; color: var(--faint); font-size: 11px;
+        }}
+        table.dataTable thead th.sorting_asc::after {{
+            content: "▲"; float: right; color: var(--oro); font-size: 10px;
+        }}
+        table.dataTable thead th.sorting_desc::after {{
+            content: "▼"; float: right; color: var(--oro); font-size: 10px;
+        }}
+    </style>
     <body>
 
         <table id="tabla-dinamica" class="display compact" border="0">
@@ -614,62 +672,54 @@ def generar_top_holdings(carpeta_holdings, csv_rebalanceo):
         'SWITZERLAND': '🇨🇭', 'GERMANY': '🇩🇪', 'FRANCE': '🇫🇷', 'CANADA': '🇨🇦', 'CHILE': '🇨🇱'
     }
 
-   
-    y_labels = []
+
     for idx, row in df_top10.iterrows():
         ticker_primer = str(row['ASSET_TICKER']).split('/')[0].strip()
         pais_emisor = str(row['COUNTRY']).upper().strip()
         emoji_bandera = mapeo_banderas.get(pais_emisor, '🌐')
-        y_labels.append(f"{emoji_bandera} {row['COMPANY_CLEAN']} <span style='color:#64748b; font-size:12px;'>({ticker_primer})</span>")
 
-    fig = go.Figure()
+
+
 
     max_weight = max(df_top10['POND_WEIGHT'].max(), df_top10['BENCH_WEIGHT'].max())
+
+
     
+    
+    fig = go.Figure()
+
+    # ── FTAW: champagne apagado (la referencia) ──
     fig.add_trace(go.Bar(
         y=df_top10['COMPANY_CLEAN'],
         x=df_top10['BENCH_WEIGHT'],
         name='FTAW',
         orientation='h',
-        marker=dict(
-            color=df_top10['BENCH_WEIGHT'],
-            colorscale='greys',       
-            cauto=False,                   
-            cmin=-0.01,        
-            cmax=max_weight,           
-        ),
+        marker=dict(color='#56422d'),
         text=df_top10['BENCH_WEIGHT'].map(lambda x: f"{x:.2%}" if x > 0 else "0.00%"),
         textposition='outside',
-        textfont=dict(size=12, color='#64748b', family='Arial'),
+        textfont=dict(size=12, color='#a89c85', family='Arial'),
         hovertemplate='<b>%{y}</b><br>Peso FTAW: %{x:.2%}<extra></extra>'
     ))
 
-
-    
+    # ── Nekonometrics: ORO (el protagonista) ──
     fig.add_trace(go.Bar(
         y=df_top10['COMPANY_CLEAN'],
         x=df_top10['POND_WEIGHT'],
         name='Nekonometrics',
         orientation='h',
-        marker=dict(
-            color=df_top10['POND_WEIGHT'],
-            colorscale='reds',       
-            cauto=False,                   
-            cmin=-0.01,
-            cmax=max_weight,                   
-        ),
+        marker=dict(color='#32271c'),
         text=df_top10['POND_WEIGHT'].map(lambda x: f"{x:.2%}"),
         textposition='outside',
-        textfont=dict(size=12, color='#1e293b', family='Arial'),
+        textfont=dict(size=12, color='#a89c85', family='Arial'),
         hovertemplate='<b>%{y}</b><br>Peso Neko: %{x:.2%}<extra></extra>'
     ))
 
-    
+
     
     fig.update_xaxes(
-        showgrid=True, gridcolor='#f1f5f9', tickformat=".2%",
-        zeroline=True, zerolinecolor='#cbd5e1', zerolinewidth=1,
-        tickfont=dict(size=13, color='#475569')
+        showgrid=True, gridcolor='#241c14', tickformat=".2%",
+        zeroline=True, zerolinecolor='#54402c', zerolinewidth=1,
+        tickfont=dict(size=13, color='#a89c85')
     )
     
     fig.update_yaxes(
@@ -688,16 +738,15 @@ def generar_top_holdings(carpeta_holdings, csv_rebalanceo):
         nombre_clean = row['COMPANY_CLEAN']
 
         anotaciones_holdings.append(dict(
-            x=0, 
-            y=nombre_clean, 
-            text=f"{emoji_bandera} <b>{nombre_clean}</b> <span style='color:#64748b; font-size:12px;'>({ticker_primer})</span>",
-            showarrow=False,
-            xref="x", yref="y",
-            xanchor="left", 
-            yanchor="bottom", 
-            yshift=14,
-            font=dict(color='#1e293b', size=13, family='Arial')
+            x=0, y=nombre_clean,
+            text=f"{emoji_bandera} <b>{nombre_clean}</b> <span style='color:#a89c85; font-size:12px;'>({ticker_primer})</span>",
+            showarrow=False, xref="x", yref="y",
+            xanchor="left", yanchor="bottom", yshift=14,
+            font=dict(color='#e8e2d4', size=13, family='Arial')
         ))
+
+        # ── Etiquetas fuera del área de datos ──
+
 
     peso_total_top10_yo = df_top10['POND_WEIGHT'].sum()
     peso_total_top10_bench = df_top10['BENCH_WEIGHT'].sum()
@@ -705,25 +754,23 @@ def generar_top_holdings(carpeta_holdings, csv_rebalanceo):
     fig.update_layout(
         title={
             'text': f'<b>Concentración en el Top 10 — Nekonometrics: {peso_total_top10_yo:.2%} vs FTAW: {peso_total_top10_bench:.2%}</b>',
-            'font': {'size': 16, 'color': '#1e293b', 'family': 'Arial'},
+            'font': {'size': 16, 'color': '#f7f2e4', 'family': 'Arial'},
             'y': 0.06, 'x': 0.5, 'xanchor': 'center'
         },
-        barmode='group',
-        bargap=0.4,
-        bargroupgap=0.05,
-        #height=520,
+        barmode='group', bargap=0.4, bargroupgap=0.05,
         margin=dict(l=5, r=0, t=0, b=0),
-        plot_bgcolor='white',
-        paper_bgcolor='white',
+        plot_bgcolor='#0f0d0a',
+        paper_bgcolor='#0f0d0a',
+        font=dict(color='#e8e2d4'),
         annotations=anotaciones_holdings,
         legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=-0.15,
-            xanchor="center",
-            x=0.5,
-            font=dict(size=12, color='#475569')
-        )
+            orientation="h", yanchor="bottom", y=-0.15,
+            xanchor="center", x=0.5,
+            font=dict(size=12, color='#a89c85'),
+            bgcolor='rgba(0,0,0,0)'
+        ),
+        hoverlabel=dict(bgcolor='#241c15', bordercolor='#f0b64b',
+                        font=dict(color='#f5e6c8', size=12)),
     )
 
     output_html = "top_holdings.html"
