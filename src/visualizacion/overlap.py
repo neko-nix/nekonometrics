@@ -123,8 +123,8 @@ def generar_sankey_overlap_puro(df_tabla, csv_ftaw):
         barmode='stack',
         bargap=0.52,                       # columnas no tan gordas ✅
         plot_bgcolor=FONDO, paper_bgcolor=FONDO,
-        height=480,
-        margin=dict(l=20, r=20, t=45, b=35),
+        height=498,
+        margin=dict(l=20, r=20, t=25, b=35),
         xaxis=dict(
             showgrid=False, zeroline=False,
             tickfont=dict(size=14, color='#e8e2d4'),
@@ -134,7 +134,7 @@ def generar_sankey_overlap_puro(df_tabla, csv_ftaw):
             range=[0, 100], showgrid=False, zeroline=False,
             showticklabels=False, ticks='',   # los % ya están adentro ✅
         ),
-        legend=dict(orientation='h', y=1.16, x=0.5, xanchor='center',
+        legend=dict(orientation='h', y=1.1, x=0.5, xanchor='center',
                     font=dict(size=12, color='#a89c85'),
                     bgcolor='rgba(0,0,0,0)'),
     )
@@ -210,7 +210,7 @@ def generar_sankey_overlap_puro(df_tabla, csv_ftaw):
         </div>
         <div style="font-size:10px; letter-spacing:2px; color:#a89c85;
                     margin-top:2px;">ACTIVE SHARE</div>
-        <div style="font-size:12px; color:#8a7d6a; margin-top:8px;">
+        <div style="font-size:13px; color:#8a7d6a; margin-top:8px;">
             {n_compartidas:,} de {n_empresas_ftaw:,} empresas del FTAW <br>
             {portfolio_overlap:.1f}% del capital replicado
         </div>

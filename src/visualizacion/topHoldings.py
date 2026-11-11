@@ -753,18 +753,18 @@ def generar_top_holdings(carpeta_holdings, csv_rebalanceo):
 
     fig.update_layout(
         title={
-            'text': f'<b>Concentración en el Top 10 — Nekonometrics: {peso_total_top10_yo:.2%} vs FTAW: {peso_total_top10_bench:.2%}</b>',
+            'text': f'<b>Concentración en el Top 10<br>Nekonometrics: {peso_total_top10_yo:.2%} vs FTAW: {peso_total_top10_bench:.2%}</b>',
             'font': {'size': 16, 'color': '#f7f2e4', 'family': 'Arial'},
-            'y': 0.06, 'x': 0.5, 'xanchor': 'center'
+            'y': 0.96, 'x': 0.5, 'xanchor': 'center'
         },
         barmode='group', bargap=0.4, bargroupgap=0.05,
-        margin=dict(l=5, r=0, t=0, b=0),
+        margin=dict(l=5, r=0, t=50, b=0),
         plot_bgcolor='#17140f',
         paper_bgcolor='#17140f',
         font=dict(color='#e8e2d4'),
         annotations=anotaciones_holdings,
         legend=dict(
-            orientation="h", yanchor="bottom", y=-0.15,
+            orientation="h", yanchor="bottom", y=-0.10,
             xanchor="center", x=0.5,
             font=dict(size=12, color='#a89c85'),
             bgcolor='rgba(0,0,0,0)'

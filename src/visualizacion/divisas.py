@@ -83,7 +83,7 @@ def generar_esquema_monedas(df_tabla):
     if suma_pesos > 0:
         df_monedas['PESO_NUM'] = (df_monedas['PESO_NUM'] / suma_pesos) * 100
 
-    UMBRAL = 1.0
+    UMBRAL = 2.0
     monedas_grandes = df_monedas[df_monedas['PESO_NUM'] >= UMBRAL].copy()
     monedas_chicas = df_monedas[df_monedas['PESO_NUM'] < UMBRAL]
     
@@ -91,7 +91,7 @@ def generar_esquema_monedas(df_tabla):
 
     if not monedas_chicas.empty:
         fila_otras = pd.DataFrame([{
-            'MONEDA': 'Otras Divisas (<1%)',
+            'MONEDA': 'Otras Divisas (<2%)',
             'PESO_NUM': monedas_chicas['PESO_NUM'].sum()
         }])
         df_final = pd.concat([monedas_grandes, fila_otras], ignore_index=True)
@@ -156,9 +156,37 @@ def generar_esquema_monedas(df_tabla):
         'Otras Divisas (<1%)': '#cbd5e1',  # Gris claro para el "resto del mundo" agrupado
         'Otras Divisas': '#cbd5e1'
     }
-    
 
-    colores_lista = [colores_dict.get(m, '#94a3b8') for m in df_final['MONEDA']]
+    MONEDA_ORO = [
+    '#f0b64b',   # 1   ORO (marca)
+    '#e6a941',   # 2
+    '#db9c38',   # 3
+    '#d18f2e',   # 4   ámbar claro
+    '#c17f2b',   # 5
+    '#b06f28',   # 6   ámbar cobrizo
+    '#a06225',   # 7
+    '#8f5522',   # 8   cobre
+    '#7d4c24',   # 9
+    '#6b4326',   # 10  nogal rojizo
+    '#5a3c25',   # 11  nogal (piso visible sobre #0f0d0a)
+    ]
+    MONEDA_RESTO = "#5a5248"   # L .086  gris cálido neutro, NO oro ✅
+        
+
+    # ── Colores: escalera de oro por peso (el cajón final NO es oro) ✅
+    n_reales = sum(1 for m in df_final['MONEDA'] if not m.startswith('Otras Divisas'))
+    colores_lista = []
+    i = 0
+    for m in df_final['MONEDA']:
+        if m.startswith('Otras Divisas'):
+            colores_lista.append(MONEDA_RESTO)          # el cajón NO es oro ✅
+        else:
+            if n_reales <= 1:
+                col = MONEDA_ORO[0]
+            else:
+                col = MONEDA_ORO[round(i * (len(MONEDA_ORO) - 1) / (n_reales - 1))]
+            colores_lista.append(col)
+            i += 1
 
     fig = go.Figure(data=[go.Pie(
         labels=df_final['MONEDA'],

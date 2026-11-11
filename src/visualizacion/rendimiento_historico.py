@@ -593,7 +593,7 @@ def generar_dashboard_premium():
             --text:#e8e2d4;      --text-strong:#f7f2e4;
             --muted:#a89c85;     --faint:#7a705e;
             --accent:#f0b64b;    --accent-bright:#ffd280;
-            --accent-dim:#b8862f;
+            --accent-dim:#f0b64b;
             --accent-soft:rgba(240,182,75,0.10);
             --accent-line:rgba(240,182,75,0.22);
             --pos:#4ade80;       --neg:#f87171;

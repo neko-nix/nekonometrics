@@ -45,7 +45,7 @@ GAMMA   = 0.65
 #  3. RAMPA DE COLOR  (módulo, no dentro de la función) ✅
 # ══════════════════════════════════════════════════════
 COLORSCALE_ORO = [
-    [0.00, "#17120d"],
+    [0.00, "#2b2115"],
     [0.16, "#241c14"],
     [0.32, "#33271b"],
     [0.46, "#4a3826"],
@@ -54,15 +54,14 @@ COLORSCALE_ORO = [
     [0.82, "#cfa869"],
     [1.00, "#f2cb7d"],
 ]
-
 COLORSCALE_GRIS = [
-    [0.00, "#17120d"],
-    [0.22, "#26221c"],
-    [0.42, "#3a352d"],
-    [0.60, "#5a5247"],
-    [0.66, "#8a7f6c"],
-    [0.82, "#ab9f8a"],
-    [1.00, "#c4b8a2"],
+    [0.00, "#2b2419"],   # L .024
+    [0.22, "#383024"],   # L .031
+    [0.42, "#4a4134"],   # L .055
+    [0.58, "#635a4a"],   # L .105
+    [0.64, "#8f8574"],   # L .239   ← SALTO (intacto) ✅
+    [0.82, "#b9ae9a"],   # L .429   ← era #a3977f (L .314) ✅
+    [1.00, "#ddd2bd"],   # L .651   ← era #b8ab94 (L .415) ✅
 ]
 
 
@@ -73,13 +72,15 @@ def _curva(m, zmax):
     return (np.clip(m, 0, zmax) / zmax) ** GAMMA
 
 
-def _figura_matriz_html(matriz, global_max, colorscale, titulo,
+
+
+def _figura_matriz_html(matriz, escala_max, colorscale, titulo,
                         umbral=0.63, incluir_js=False):
     fig = go.Figure()
 
     fig.add_trace(go.Heatmap(
         x=ESTILOS, y=TAMANOS,
-        z=_curva(matriz, global_max),
+        z=_curva(matriz, escala_max),
         customdata=matriz,
         colorscale=colorscale,
         showscale=False,
@@ -94,7 +95,7 @@ def _figura_matriz_html(matriz, global_max, colorscale, titulo,
     for i, tam in enumerate(TAMANOS):
         for j, est in enumerate(ESTILOS):
             v   = matriz[i][j]
-            pos = (max(float(v), 0.0) / global_max) ** GAMMA
+            pos = (max(float(v), 0.0) / escala_max) ** GAMMA
             fig.add_annotation(
                 x=est, y=tam,
                 text=f"<b>{v:.1f}%</b>",
@@ -114,7 +115,7 @@ def _figura_matriz_html(matriz, global_max, colorscale, titulo,
         paper_bgcolor=SUP,
         plot_bgcolor=SUP,
         height=350,
-        margin=dict(l=48, r=8, t=82, b=8),
+        margin=dict(l=8, r=8, t=82, b=8),
         showlegend=False,
         hovermode="closest",
         font=dict(family="'Segoe UI',Arial,sans-serif", color=TEXTO),
@@ -126,7 +127,7 @@ def _figura_matriz_html(matriz, global_max, colorscale, titulo,
 
     fig.update_xaxes(
         side="top",
-        tickfont=dict(size=11, color=ORO_DIM),
+        tickfont=dict(size=11, color=MUTED),
         fixedrange=True, showgrid=False, zeroline=False,
         linecolor=BORDE,
     )
@@ -218,14 +219,19 @@ def exportar_bloque_style_box_html(ruta_csv, ruta_salida_html="bloque_2b_style_b
     # ── Escala COMPARTIDA: los dos paneles comparables ✅ ──
     global_max = float(max(matriz_portafolio.max(), matriz_bench.max())) or 1.0
 
+        # ── Escala POR PANEL: cada matriz usa su propio máximo ✅ ──
+    max_port  = float(matriz_portafolio.max()) or 1.0
+    max_bench = float(matriz_bench.max())      or 1.0
+
     html_port = _figura_matriz_html(
-        matriz_portafolio, global_max, COLORSCALE_ORO, "Nekonometrics",
+        matriz_portafolio, max_port,  COLORSCALE_ORO,  "Nekonometrics",
         incluir_js=True,
     )
     html_bench = _figura_matriz_html(
-        matriz_bench, global_max, COLORSCALE_GRIS, "FTAW",
+        matriz_bench,      max_bench, COLORSCALE_GRIS, "FTAW",
         incluir_js=False,
     )
+
 
     html_kpis = _tarjetas_kpi_html(matriz_portafolio, matriz_bench)
 
@@ -251,7 +257,7 @@ def exportar_bloque_style_box_html(ruta_csv, ruta_salida_html="bloque_2b_style_b
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
       gap: 4px;
-      margin-bottom: 10px;
+      margin-bottom: 50px;
   }}
   .matrices-row > div {{ min-width: 0; }}
 
