@@ -12,12 +12,18 @@ def generar_sankey_overlap_puro(df_tabla, csv_ftaw):
 
     df_yo = df_tabla.copy()
     df_yo.columns = [str(c).strip().upper() for c in df_yo.columns]
-    
-    col_ticker_yo = [c for c in df_yo.columns if 'TICKER' in c or 'ASSET_TICKER' in c][0]
-    col_prop_yo = [c for c in df_yo.columns if 'PROPORCIONACTUAL' in c or 'PESO' in c][0]
-    col_pais_yo = [c for c in df_yo.columns if 'PAIS' in c or 'COUNTRY' in c or 'REGION' in c][0]
-    
-    df_yo['PESO_YO'] = df_yo[col_prop_yo].astype(str).str.replace('%', '').str.strip()
+
+    col_ticker_yo = [c for c in df_yo.columns if 'TICKER' in c][0]
+    col_pais_yo   = [c for c in df_yo.columns if 'COUNTRY' in c or 'PAIS' in c or 'REGION' in c][0]
+    col_prop_yo   = 'PESO_MUESTRA' if 'PESO_MUESTRA' in df_yo.columns \
+                    else [c for c in df_yo.columns if 'PESO' in c][0]
+
+    df_yo['PESO_YO'] = pd.to_numeric(
+        df_yo[col_prop_yo].astype(str).str.replace('%', '', regex=False).str.strip(),
+        errors='coerce'
+    ).fillna(0)
+
+    #print("Σ PESO_YO crudo:", df_yo['PESO_YO'].sum())   # debe dar ≈100 (o ≈1)
     df_yo['PESO_YO'] = pd.to_numeric(df_yo['PESO_YO'], errors='coerce').fillna(0)
     
     df_yo = df_yo[df_yo[col_ticker_yo].notna() & (df_yo['PESO_YO'] > 0)]
@@ -43,14 +49,18 @@ def generar_sankey_overlap_puro(df_tabla, csv_ftaw):
         col_peso_ftaw = [c for c in df_ftaw_raw.columns if 'WEIGHT' in c or 'PESO' in c or 'POND' in c][0]
         col_pais_ftaw = [c for c in df_ftaw_raw.columns if c in ['LOCATION', 'MARKET', 'COUNTRY', 'PAIS']][0]
         
-        df_ftaw = df_ftaw_raw[[col_ticker_ftaw, col_pais_ftaw, col_peso_ftaw]].copy()
-        df_ftaw.columns = ['TICKER', 'PAIS', 'PESO_FTAW']
-        
-        df_ftaw['PESO_FTAW'] = df_ftaw['PESO_FTAW'].astype(str).str.replace('"', '').str.replace('%', '').str.strip()
-        df_ftaw['PESO_FTAW'] = pd.to_numeric(df_ftaw['PESO_FTAW'], errors='coerce').fillna(0)
-        
-        df_ftaw = df_ftaw[df_ftaw['TICKER'].notna() & (df_ftaw['PESO_FTAW'] > 0)]
-        df_ftaw = df_ftaw[~df_ftaw['TICKER'].astype(str).str.upper().str.contains('CASH|EFECTIVO|NAN|USD|CLP')]
+        cols = [col_ticker_ftaw, col_pais_ftaw, col_peso_ftaw]
+        if 'ASSET CLASS' in df_ftaw_raw.columns:
+            cols.append('ASSET CLASS')
+
+        df_ftaw = df_ftaw_raw[cols].copy()
+        df_ftaw.columns = ['TICKER', 'PAIS', 'PESO_FTAW'] + \
+                          (['ASSET_CLASS'] if len(cols) == 4 else [])
+
+        if 'ASSET_CLASS' in df_ftaw.columns:
+            df_ftaw = df_ftaw[df_ftaw['ASSET_CLASS'].astype(str).str.strip().str.lower() == 'equity']
+        tick = df_ftaw['TICKER'].astype(str).str.strip().str.upper()
+        df_ftaw = df_ftaw[~tick.isin(['', 'NAN', '-'])]
         
         df_ftaw['LLAVE_UNICA'] = df_ftaw.apply(
             lambda r: f"{str(r['TICKER']).strip().upper()}_{limpiar_pais(r['PAIS'])}", axis=1
@@ -64,8 +74,13 @@ def generar_sankey_overlap_puro(df_tabla, csv_ftaw):
     set_ftaw = set(df_ftaw['LLAVE_UNICA'])
     
     n_empresas_yo = len(set_yo)
-    n_empresas_ftaw = len(set_ftaw)
+    n_empresas_ftaw = len(set(df_ftaw['LLAVE_UNICA']))   # ~2,682
     n_compartidas = len(set_yo.intersection(set_ftaw))
+
+    pct_nombre = n_compartidas / n_empresas_ftaw * 100
+
+ 
+
     
 
     df_yo_agrupado = df_yo.groupby('LLAVE_UNICA')['PESO_YO'].sum().reset_index()
@@ -93,14 +108,16 @@ def generar_sankey_overlap_puro(df_tabla, csv_ftaw):
 
     fig = go.Figure()
 
-    categorias = ["Capital", "Empresas"]
+    categorias = ["Capital", "Posiciones"]
     comunes    = [portfolio_overlap, pct_nombre]
     propios    = [active_share,     pct_fuera]
+
+
 
     fig.add_trace(go.Bar(
         x=categorias, y=comunes,
         marker=dict(color='#56422d', line=dict(color=FONDO, width=2)),
-        text=[f"{v:.0f}%" for v in comunes],
+        text=[f"{v:.1f}%" for v in comunes],
         textposition='auto', insidetextanchor='middle',
         textfont=dict(size=16, color='#e8e2d4', family='Arial'),
         name="En común", legendgroup="comun", showlegend=True,
@@ -111,7 +128,7 @@ def generar_sankey_overlap_puro(df_tabla, csv_ftaw):
     fig.add_trace(go.Bar(
         x=categorias, y=propios,
         marker=dict(color='#f0b64b', line=dict(color=FONDO, width=2)),
-        text=[f"{v:.0f}%" for v in propios],
+        text=[f"{v:.1f}%" for v in propios],
         textposition='auto', insidetextanchor='middle',
         textfont=dict(size=16, color='#2a2118', family='Arial'),   # oscuro sobre oro ✅
         name="Diferencial", legendgroup="propio", showlegend=True,
@@ -152,12 +169,31 @@ def generar_sankey_overlap_puro(df_tabla, csv_ftaw):
     df_all['DELTA']  = df_all['PESO_YO'] - df_all['PESO_FTAW']
     df_all['NOMBRE'] = df_all['LLAVE_UNICA'].str.rsplit('_', n=1).str[0]
 
-    print(f"Unión: {len(df_all):,} nombres "
-          f"({len(df_yo_agrupado):,} míos, {len(df_ftaw_agrupado):,} del FTAW)")
-    print(f"Σ PESO_YO   = {df_all['PESO_YO'].sum():.2f}  (debe ser 100)")
-    print(f"Σ PESO_FTAW = {df_all['PESO_FTAW'].sum():.2f}  (debe ser 100)")
-    print(f"Σ|Δ|/2      = {(0.5 * df_all['DELTA'].abs().sum()):.2f}  "
-          f"(debe ser ≈ {active_share:.2f})")
+    # ── DESCOMPOSICIÓN DEL ACTIVE SHARE ─────────────────────────
+    S  = df_all[(df_all['PESO_YO'] > 0) & (df_all['PESO_FTAW'] > 0)]
+    YO = df_all[df_all['PESO_FTAW'] == 0]
+    FT = df_all[df_all['PESO_YO']   == 0]
+
+    parte_extra  = 0.5 * YO['PESO_YO'].sum()
+    parte_falta  = 0.5 * FT['PESO_FTAW'].sum()
+    parte_sizing = 0.5 * S['DELTA'].abs().sum()
+    total        = parte_extra + parte_falta + parte_sizing
+
+    # ═══ SANITY CHECK — queda prendido, corre en 0.1s ═══
+    s_yo = df_yo['PESO_YO'].sum()
+    checks = {
+        "escala PESO_YO ~1 o ~100 (no ~50)": abs(s_yo - 1) < 0.05 or abs(s_yo - 100) < 2,
+        "Σ PESO_YO agrupado   = 100":        abs(df_yo_agrupado['PESO_YO'].sum() - 100) < 0.01,
+        "Σ PESO_FTAW agrupado = 100":        abs(df_ftaw_agrupado['PESO_FTAW'].sum() - 100) < 0.01,
+        "0 <= overlap <= 100":               0 <= portfolio_overlap <= 100,
+        "identidad 100−overlap = 0.5·Σ|Δ|":  abs(active_share - 0.5 * df_all['DELTA'].abs().sum()) < 0.05,
+        "hay posiciones compartidas":        n_compartidas > 0,
+        "FTAW trae posiciones (>1000)":      len(df_ftaw) > 1000,
+    }
+    for nombre, ok in checks.items():
+        print(("  ✅ " if ok else "  ❌ ") + nombre)
+    if not all(checks.values()):
+        print("  ⚠️  REVISAR ANTES DE PUBLICAR")
 
     # ══════════════════════════════════════════════════════════
     #  2) TOP 10 SOBRE + TOP 10 SUB  (nace acá ✅)
@@ -169,8 +205,8 @@ def generar_sankey_overlap_puro(df_tabla, csv_ftaw):
 
     colores = ['#f0b64b' if v > 0 else '#8f5522' for v in top['DELTA']]
 
-    print(f"top: {len(top)} barras  (min {top['DELTA'].min():+.2f} pp, "
-          f"max {top['DELTA'].max():+.2f} pp)")
+    #print(f"top: {len(top)} barras  (min {top['DELTA'].min():+.2f} pp, "
+    #      f"max {top['DELTA'].max():+.2f} pp)")
 
     # ══════════════════════════════════════════════════════════
     #  3) fig2  ⚠️ recién acá, con top ya definido ✅
@@ -206,12 +242,12 @@ def generar_sankey_overlap_puro(df_tabla, csv_ftaw):
     <div style="font-family:'Segoe UI',sans-serif; background:{FONDO};
                 padding:14px 0 0 0; text-align:center;">
         <div style="font-size:34px; color:#f0b64b; font-weight:600; line-height:1.1;">
-            {active_share:.0f}%
+            {active_share:.1f}%
         </div>
         <div style="font-size:10px; letter-spacing:2px; color:#a89c85;
                     margin-top:2px;">ACTIVE SHARE</div>
         <div style="font-size:13px; color:#8a7d6a; margin-top:8px;">
-            {n_compartidas:,} de {n_empresas_ftaw:,} empresas del FTAW <br>
+            {n_compartidas:,} de {n_empresas_ftaw:,} posiciones del FTAW <br>
             {portfolio_overlap:.1f}% del capital replicado
         </div>
     </div>

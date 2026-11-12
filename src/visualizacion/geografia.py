@@ -88,10 +88,10 @@ def generar_mapa_global(carpeta_holdings, csv_rebalanceo):
     final_geo['ISO3'] = final_geo['PAIS_UP'].map(ISO3)
     faltantes = final_geo[final_geo['ISO3'].isna()]['COUNTRY'].tolist()
 
-    if faltantes:
-        print(f"⚠️ Sin ISO3: {faltantes}")
-    else:
-        print("✅ Todos los países tienen ISO3")
+    #if faltantes:
+    #    print(f"⚠️ Sin ISO3: {faltantes}")
+    #else:
+    #    print("✅ Todos los países tienen ISO3")
 
     final_geo['POS_COLOR'] = final_geo['POND_WEIGHT'].rank(method='average', pct=True)
 

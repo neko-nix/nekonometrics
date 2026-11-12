@@ -841,7 +841,7 @@ def generar_dashboard_premium():
                     </div>
                     <div style="margin-top: 14px; border-top: 1px dashed var(--border-soft); padding-top: 8px; display: flex; justify-content: space-between; font-size: 13px;">
                         <span style="color: {color_alfa}; font-weight: 700;">🚀 Alfa: {alfa_usd_str}</span>
-                        <span style="color: var(--faint);">FTAW: {m['USD']['bench']['CAGR']:.2f}%</span>
+                        <span style="color: var(--faint);">FTAW: {bench_cagr_str}</span>
                     </div>
 
                     
