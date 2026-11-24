@@ -161,7 +161,8 @@ def enriquecer_ucits_con_multiples_usa(path_ucits, lista_paths_usa, path_salida)
 
 
 def descargar_holdings_ftaw(output_path="data/ftaw_holdings.csv"):
-    url_blackrock = "https://www.blackrock.com/uk/individual/products/349410/fund/1472631233320.ajax?fileType=csv&fileName=FTAW_holdings&dataType=fund"
+    url_blackrock = "https://www.blackrock.com/es/profesionales/productos/349410/fund/1497267045693.ajax?fileType=csv&fileName=FTAW_holdings&dataType=fund"
+    
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
     print("Descargando holdings actualizados de FTAW (BlackRock)...")
     
