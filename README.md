@@ -3,7 +3,7 @@
 ![Python](https://img.shields.io/badge/python-3.12+-orange?logo=python&logoColor=white)
 ![NixOS](https://img.shields.io/badge/NixOS-blue?logo=nixos&logoColor=white&color=5277C3)
 ![SQLite](https://img.shields.io/badge/sqlite-%2307405e.svg?logo=sqlite&logoColor=white)
-![Version](https://img.shields.io/badge/version-0.1-brightgreen)
+![Version](https://img.shields.io/badge/version-0.1.1-brightgreen)
 [![License: AGPL v3](https://img.shields.io/badge/license-AGPLv3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
 ![GitHub last commit](https://img.shields.io/github/last-commit/neko-nix/nekonometrics)
