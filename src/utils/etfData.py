@@ -7,6 +7,29 @@ import urllib.request
 from pathlib import Path
 import os
 from pypdf import PdfReader
+from urllib.parse import urlencode
+
+
+BLACKROCK_API = (
+    "https://www.blackrock.com/varnish-api/uk-retail01-product-data"
+    "/product-data/api/v1/get-fund-document"
+)
+
+FTAW_PARAMS = {
+    "appType":     "PRODUCT_PAGE",
+    "appSubType":  "ISHARES",
+    "targetSite":  "ishares-uk",
+    "locale":      "en_GB",
+    "portfolioId": "349410",
+    "userType":    "institutional",
+    "component":   "holdings",
+}
+
+FTAW_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+    "Referer":    "https://www.blackrock.com/uk/individual/products/349410/",
+    "Origin":     "https://www.blackrock.com",
+}
 
 def descargarHoldings(URL_WEB, pathSave):
 
@@ -161,19 +184,26 @@ def enriquecer_ucits_con_multiples_usa(path_ucits, lista_paths_usa, path_salida)
 
 
 def descargar_holdings_ftaw(output_path="data/ftaw_holdings.csv"):
-    url_blackrock = "https://www.blackrock.com/es/profesionales/productos/349410/fund/1497267045693.ajax?fileType=csv&fileName=FTAW_holdings&dataType=fund"
-    
+    url = f"{BLACKROCK_API}?{urlencode(FTAW_PARAMS)}"
+
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
     print("Descargando holdings actualizados de FTAW (BlackRock)...")
-    
 
-    req = urllib.request.Request(
-        url_blackrock, 
-        headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
-    )
+    req = urllib.request.Request(url, headers=FTAW_HEADERS)
 
-    with urllib.request.urlopen(req, timeout=30) as response, open(output_path, 'wb') as out_file:
-        out_file.write(response.read())
-        
+    with urllib.request.urlopen(req, timeout=30) as response:
+        data = response.read()
+
+    # ── guardia: CSV vacío = 200 OK con solo cabecera (falla silenciosa) 💀
+    if b'as of,"-"' in data or len(data) < 500:
+        raise RuntimeError(
+            "FTAW: BlackRock devolvió un CSV vacío (as of \"-\"). "
+            "Sin holdings publicados para la fecha pedida. "
+            f"Tamaño recibido: {len(data)} bytes."
+        )
+
+    with open(output_path, "wb") as out_file:
+        out_file.write(data)
+
     print(f"¡CSV de FTAW guardado con éxito en: {output_path}!")
     return True
